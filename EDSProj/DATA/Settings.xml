@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			 xmlns:xsd="http://www.w3.org/2001/XMLSchema">  
+  <SMTPServer>mx-votges-021.corp.gidroogk.com</SMTPServer>
+  <SMTPUser>is</SMTPUser>
+  <SMTPPassword>12345</SMTPPassword>
+  <SMTPDomain>CORP</SMTPDomain>
+  <SMTPFrom>is@votges.rushydro.ru</SMTPFrom>
+  <SMTPTo>chekunovaMV@votges.rushydro.ru</SMTPTo>
+  <SMTPPort>25</SMTPPort>
+
+  <EDSUser>admin</EDSUser>
+  <EDSPassword>Ovation123</EDSPassword>
+  
+  <FTPActive>false</FTPActive> <!--Активный режим FTP-->
+  <FTPServer>10.7.3.15</FTPServer> <!--Адрес FTP сервера-->
+  <FTPPort>21</FTPPort> <!--Порт 21-->
+  <FTPUser>AO_USER</FTPUser> <!--Пользователь FTP-->
+  <FTPPassword>Ovation1</FTPPassword> <!--Пароль FTP-->
+
+  <LogPath>c:/edscalc/logs</LogPath> 
+
+</Settings>
