@@ -15,7 +15,7 @@ namespace EDSCnsl
 			Logger.InitFileLogger(Settings.Single.LogPath, "pbrExport");
 			
 			MCSettings.init("Data/MCSettings.xml");
-
+			 
 			MCServerReader reader = new MCServerReader(DateTime.Now.Date);
 		}
 	}
