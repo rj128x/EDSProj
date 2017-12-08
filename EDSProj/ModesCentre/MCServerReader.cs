@@ -1,4 +1,5 @@
-﻿using Modes;
+﻿using EDSProj.EDSWebService;
+using Modes;
 using Modes.BusinessLogic;
 using ModesApiExternal;
 using System;
@@ -102,8 +103,48 @@ namespace EDSProj.ModesCentre
 						} catch {
 							Logger.Info("Ошибка при записи ПБР в базу");
 						}
-
 					}
+					Logger.Info("Запись номера ПБР");
+
+					DateTime ds = DateTime.Now;
+					DateTime de = this.Date.AddDays(1);
+					List<ShadeSelector> sel = new List<ShadeSelector>();
+					sel.Add(new ShadeSelector() {
+						period = new TimePeriod() {
+							from = new Timestamp() { second = EDSClass.toTS(ds) },
+							till = new Timestamp() { second = EDSClass.toTS(de) }
+						},
+						pointId = new PointId() {
+							iess = "NPBR.EDS@CALC"
+						}
+					});
+
+					Logger.Info("Удаление номера ПБР");
+					uint id = EDSClass.Client.requestShadesClear(EDSClass.AuthStr, sel.ToArray());
+					ok = EDSClass.ProcessQuery(id);
+
+					if (ok) {
+						List<Shade> shades = new List<Shade>();
+						List<ShadeValue> vals = new List<ShadeValue>();
+						vals.Add(new ShadeValue() {
+							period = new TimePeriod() {
+								from = new Timestamp() { second = EDSClass.toTS(ds) },
+								till = new Timestamp() { second = EDSClass.toTS(de) }
+							},
+							quality = Quality.QUALITYGOOD,
+							value = new PointValue() { av = NPBR, avSpecified = true }
+						});
+						shades.Add(new Shade() {
+							pointId = new PointId() { iess = "NPBR.EDS@CALC" },
+							values = vals.ToArray()
+						});
+						Logger.Info("Запись данных");
+						id = EDSClass.Client.requestShadesWrite(EDSClass.AuthStr, shades.ToArray());
+						ok = EDSClass.ProcessQuery(id);
+					}
+					
+
+					
 				}
 			} catch (Exception e) {
 				Logger.Info("Ошибка при получении ПБР с сервера MC " + e);
@@ -164,7 +205,7 @@ namespace EDSProj.ModesCentre
 		}
 
 		protected void sendAutooperData() {
-			string fn ="pbr-0000" + (NPBR < 10 ? "0" : "") + NPBR.ToString() + "-" + Date.ToString("yyyyMMdd") + ".csv";
+			string fn = "pbr-0000" + (NPBR < 10 ? "0" : "") + NPBR.ToString() + "-" + Date.ToString("yyyyMMdd") + ".csv";
 			string body = String.Join("\r\n", AutooperData);
 			try {
 				StreamWriter sw = new StreamWriter(fn, false);

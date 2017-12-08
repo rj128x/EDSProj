@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EDSProj;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,6 +23,14 @@ namespace EDSApp
 	{
 		public MainWindow() {
 			InitializeComponent();
+			Settings.init("Data/Settings.xml");
+			Logger.InitFileLogger(Settings.Single.LogPath, "EDSApp");
+			List<EDSPointInfo> data=EDSPointsClass.GetAllPoints();
+		}
+
+		private void button_Click(object sender, RoutedEventArgs e) {
+			SelectPointsWindow win = new EDSApp.SelectPointsWindow();
+			win.Show();
 		}
 	}
 }

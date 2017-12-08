@@ -1,4 +1,5 @@
 ﻿using EDSProj;
+using EDSProj.EDSWebService;
 using EDSProj.ModesCentre;
 using System;
 using System.Collections.Generic;
@@ -15,8 +16,8 @@ namespace EDSCnsl
 			Logger.InitFileLogger(Settings.Single.LogPath, "pbrExport");
 			
 			MCSettings.init("Data/MCSettings.xml");
-			 
 			MCServerReader reader = new MCServerReader(DateTime.Now.Date);
+
 		}
 	}
 }

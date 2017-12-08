@@ -67,7 +67,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EDSClass.cs" />
+    <Compile Include="EDS\EDSClass.cs" />
+    <Compile Include="EDS\EDSPointsClass.cs" />
     <Compile Include="FTPClass.cs" />
     <Compile Include="Impersonator.cs" />
     <Compile Include="ModesCentre\MCPBRData.cs" />
@@ -85,6 +86,7 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="DATA\allPoints.txt" />
     <Content Include="DATA\MCSettings.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
