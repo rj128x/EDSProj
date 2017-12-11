@@ -18,6 +18,7 @@ f1.pushTimestampParam(t-3600)
 f1ID=arch.addQuery(f1)
 print f1ID
 
+
 f2=arch.getFunction('MAX_VALUE')
 f2.pushPointParam(54435,0xff,pyxeds2.ArchShadeMode.PreferArch)
 f2.pushTimestampParam(t-60)
