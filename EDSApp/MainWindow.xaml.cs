@@ -22,9 +22,9 @@ namespace EDSApp
 	public partial class MainWindow : Window
 	{
 		public MainWindow() {
-			InitializeComponent();
+			InitializeComponent(); 
 			Settings.init("Data/Settings.xml");
-			Logger.InitFileLogger(Settings.Single.LogPath, "EDSApp");
+			Logger.InitFileLogger(Settings.Single.LogPath, "EDSApp1");
 		}
 
 		private void button_Click(object sender, RoutedEventArgs e) {
