@@ -14,9 +14,10 @@ namespace EDSCnsl
 		static void Main(string[] args) {
 			Settings.init("Data/Settings.xml");
 			Logger.InitFileLogger(Settings.Single.LogPath, "pbrExport");
-			
-			MCSettings.init("Data/MCSettings.xml");
-			MCServerReader reader = new MCServerReader(DateTime.Now.Date);
+			Logger.Info(string.Format("Считано аналоговых точек: {0}", EDSPointsClass.AllAnalogPoints.Count));
+			Console.ReadLine();
+			/*MCSettings.init("Data/MCSettings.xml");
+			MCServerReader reader = new MCServerReader(DateTime.Now.Date);*/
 
 		}
 	}

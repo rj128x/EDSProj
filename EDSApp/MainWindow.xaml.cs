@@ -25,7 +25,6 @@ namespace EDSApp
 			InitializeComponent();
 			Settings.init("Data/Settings.xml");
 			Logger.InitFileLogger(Settings.Single.LogPath, "EDSApp");
-			List<EDSPointInfo> data=EDSPointsClass.GetAllPoints();
 		}
 
 		private void button_Click(object sender, RoutedEventArgs e) {
