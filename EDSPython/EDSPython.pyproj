@@ -6,12 +6,13 @@
     <ProjectGuid>6e852a36-84ae-43af-a5cd-095cbaa9d01c</ProjectGuid>
     <ProjectHome>.</ProjectHome>
     <StartupFile>EDSPython.py</StartupFile>
-    <SearchPath>
-    </SearchPath>
+    <SearchPath>..\..\..\..\Program Files\EDS\Api</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>EDSPython</Name>
     <RootNamespace>EDSPython</RootNamespace>
+    <IsWindowsApplication>False</IsWindowsApplication>
+    <InterpreterId>Global|PythonCore|2.7-32</InterpreterId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -25,10 +26,7 @@
     <Compile Include="EDSPython.py" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="..\..\..\..\Program Files\EDS\Api\pyxeds2.pyd">
-      <Name>pyxeds2.pyd</Name>
-      <PythonExtension>..\..\..\..\Program Files\EDS\Api\pyxeds2.pyd</PythonExtension>
-    </Reference>
+    <InterpreterReference Include="Global|PythonCore|2.7-32" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
