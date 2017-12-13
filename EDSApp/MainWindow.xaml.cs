@@ -24,11 +24,11 @@ namespace EDSApp
 		public MainWindow() {
 			InitializeComponent(); 
 			Settings.init("Data/Settings.xml");
-			Logger.InitFileLogger(Settings.Single.LogPath, "EDSApp1");
+			Logger.InitFileLogger(Settings.Single.LogPath, "EDSApp");
 		}
 
 		private void button_Click(object sender, RoutedEventArgs e) {
-			SelectPointsWindow win = new EDSApp.SelectPointsWindow();
+			ReportWindow win = new EDSApp.ReportWindow();
 			win.Show();
 		}
 	}

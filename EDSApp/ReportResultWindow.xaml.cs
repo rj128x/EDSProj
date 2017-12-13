@@ -15,11 +15,11 @@ using System.Windows.Shapes;
 namespace EDSApp
 {
 	/// <summary>
-	/// Логика взаимодействия для SelectPointsWindow.xaml
+	/// Логика взаимодействия для ReportResultwindow.xaml
 	/// </summary>
-	public partial class SelectPointsWindow : Window
+	public partial class ReportResultWindow : Window
 	{
-		public SelectPointsWindow() {
+		public ReportResultWindow() {
 			InitializeComponent();
 		}
 	}

@@ -12,18 +12,20 @@ namespace EDSProj
 	{
 		public string IESS { get; set; }
 		public string Desc { get; set; }
+		public string FullName { get; set; }
 
 		public EDSPointInfo(string iess, string desc) {
 			this.IESS = iess;
 			this.Desc = desc;
+			this.FullName = String.Format("{0,-40}{1}", iess, desc);
 		}
 	}
 
 	public class EDSPointsClass
 	{
-		protected static List<EDSPointInfo> _allAnalogPoints { get; set; }
+		protected static Dictionary<string,EDSPointInfo> _allAnalogPoints { get; set; }
 
-		public static List<EDSPointInfo> AllAnalogPoints {
+		public static Dictionary<string, EDSPointInfo> AllAnalogPoints {
 			get {
 				if (_allAnalogPoints == null)
 					GetAllPoints();
@@ -32,7 +34,7 @@ namespace EDSProj
 		}
 
 		protected static void GetAllPoints() {
-			_allAnalogPoints = new List<EDSPointInfo>();
+			_allAnalogPoints = new Dictionary<string, EDSPointInfo>();
 			try {
 				string[] lines = System.IO.File.ReadAllLines("Data/allPoints.txt");
 				foreach (string line in lines) {
@@ -45,8 +47,8 @@ namespace EDSProj
 							string type = match.Groups[1].Value.ToLower();
 							string iess = match.Groups[2].Value;
 							string desc = match.Groups[3].Value;
-							if (type == "analog" || type == "int64" || type == "double") {
-								_allAnalogPoints.Add(new EDSPointInfo(iess, desc));
+							if (type == "analog" || type == "double") {
+								_allAnalogPoints.Add(iess,new EDSPointInfo(iess, desc));
 							}
 						}
 					} catch (Exception e) {

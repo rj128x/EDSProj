@@ -5,8 +5,25 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EDSApp"
         mc:Ignorable="d"
-        Title="ReportWindow" Height="300" Width="300">
+        Title="ReportWindow" Height="700" Width="1000">
     <Grid>
-        
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="10"/>
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0" Grid.Column="0">
+                <Calendar Name="clndFrom"/>
+                <Calendar Name="clndTo"/>
+                <ComboBox Name="cmbPeriod" DisplayMemberPath="Value" SelectedValuePath="Key"/>
+                <ComboBox Name="cmbFunction" DisplayMemberPath="Value" SelectedValuePath="Key"/>
+                <Button Content="Сформировать" Name="btnCreate" Click="btnCreate_Click"/>
+            </StackPanel>
+            <local:SelectPointsControl x:Name="cntrlSelectPoints" Grid.Column="1" Grid.Row="0" />
+        </Grid>
     </Grid>
 </Window>
