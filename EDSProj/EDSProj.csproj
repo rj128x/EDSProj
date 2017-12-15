@@ -67,6 +67,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AIS\AIS_NEW.cs" />
+    <Compile Include="AIS\AIS_OLD.cs" />
     <Compile Include="EDS\EDSClass.cs" />
     <Compile Include="EDS\EDSPointsClass.cs" />
     <Compile Include="FTPClass.cs" />
@@ -86,6 +88,10 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="DATA\ais_new.txt" />
+    <Content Include="DATA\ais_old.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="DATA\allPoints.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -96,6 +102,7 @@
     <Content Include="DATA\Settings.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="DATA\АИС_Импорт.xlsx" />
     <None Include="Service References\EDSWebService\EDSProj.EDSWebService.Event.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
