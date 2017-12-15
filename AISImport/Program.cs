@@ -24,11 +24,10 @@ namespace AISImport
 			}
 
 			while (date < dateEnd) {
-				ais.readDataFromDB(date,date.AddHours(4));
-				date = date.AddHours(4);
+				ais.readDataFromDB(date,date.AddHours(12));
+				date = date.AddHours(12);
 			}
 
-			Console.ReadLine();
 		}
 	}
 }

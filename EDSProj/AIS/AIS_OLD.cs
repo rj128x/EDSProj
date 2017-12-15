@@ -71,69 +71,72 @@ namespace EDSProj.AIS
 			List<Shade> shades = new List<Shade>();
 			List<ShadeValue> vals = new List<ShadeValue>();
 
-			foreach (AISPointInfo point in AISPoints) {
-				SqlConnection con = getConnection(point.DBName);
-				con.Open();
-				string comSTR = "";
-				comSTR = String.Format("SELECT DATA_DATE,VALUE0 FROM DATA WHERE OBJECT={0} AND OBJTYPE={1} AND ITEM={2} AND PARNUMBER=12 AND DATA_DATE>='{3}' AND DATA_DATE<'{4}'",
-					point.Obj, point.ObjType, point.Item, dateStart.ToString(DateFormat), dateEnd.ToString(DateFormat));
-				SqlCommand command = new SqlCommand(comSTR, con);
-				SqlDataReader reader = command.ExecuteReader();
+			try {
+				foreach (AISPointInfo point in AISPoints) {
+					SqlConnection con = getConnection(point.DBName);
+					con.Open();
+					string comSTR = "";
+					comSTR = String.Format("SELECT DATA_DATE,VALUE0 FROM DATA WHERE OBJECT={0} AND OBJTYPE={1} AND ITEM={2} AND PARNUMBER=12 AND DATA_DATE>='{3}' AND DATA_DATE<'{4}'",
+						point.Obj, point.ObjType, point.Item, dateStart.ToString(DateFormat), dateEnd.ToString(DateFormat));
+					SqlCommand command = new SqlCommand(comSTR, con);
+					SqlDataReader reader = command.ExecuteReader();
 
-				
 
-				while (reader.Read()) {
-					DateTime date = reader.GetDateTime(0);
-					double val = reader.GetDouble(1);
 
-					try {
-						vals.Add(new ShadeValue() {
-							period = new TimePeriod() {
-								from = new Timestamp() { second = EDSClass.toTS(date.AddHours(2).AddMinutes(-30)) },
-								till = new Timestamp() { second = EDSClass.toTS(date.AddHours(2)) }
-							},
-							quality = Quality.QUALITYGOOD,
-							value = new PointValue() { av = (float)val, avSpecified = true }
-						});						
-					} catch { }
+					while (reader.Read()) {
+						DateTime date = reader.GetDateTime(0);
+						double val = reader.GetDouble(1);
+
+						try {
+							vals.Add(new ShadeValue() {
+								period = new TimePeriod() {
+									from = new Timestamp() { second = EDSClass.toTS(date.AddHours(2).AddMinutes(-30)) },
+									till = new Timestamp() { second = EDSClass.toTS(date.AddHours(2)) }
+								},
+								quality = Quality.QUALITYGOOD,
+								value = new PointValue() { av = (float)val, avSpecified = true }
+							});
+						} catch { }
+					}
+
+					reader.Close();
+					con.Close();
+
+					if (vals.Count == 0)
+						continue;
+
+
+					sel.Add(new ShadeSelector() {
+						period = new TimePeriod() {
+							from = new Timestamp() { second = EDSClass.toTS(dateStart.AddHours(2).AddMinutes(-30)) },
+							till = new Timestamp() { second = EDSClass.toTS(dateEnd.AddHours(2).AddMinutes(-30)) }
+						},
+						pointId = new PointId() {
+							iess = point.EDSPoint
+						}
+					});
+
+
+					shades.Add(new Shade() {
+						pointId = new PointId() { iess = point.EDSPoint },
+						values = vals.ToArray()
+					});
+
 				}
 
-				reader.Close();
-				con.Close();
+				if (!EDSClass.Connected) {
+					EDSClass.Connect();
+				}
 
-				if (vals.Count == 0)
-					continue;				
-
-				
-				sel.Add(new ShadeSelector() {
-					period = new TimePeriod() {
-						from = new Timestamp() { second = EDSClass.toTS(dateStart.AddHours(2).AddMinutes(-30)) },
-						till = new Timestamp() { second = EDSClass.toTS(dateEnd.AddHours(2).AddMinutes(-30)) }
-					},
-					pointId = new PointId() {
-						iess = point.EDSPoint
-					}
-				});				
-
-
-				shades.Add(new Shade() {
-					pointId = new PointId() { iess = point.EDSPoint },
-					values = vals.ToArray()
-				});			
-				
+				Logger.Info(String.Format("Удаление записей по точке {0} - {1} ", dateStart.ToString("dd.MM.yyyy HH:mm"), dateEnd.ToString("dd.MM.yyyy HH:mm")));
+				uint id = EDSClass.Client.requestShadesClear(EDSClass.AuthStr, sel.ToArray());
+				bool ok = EDSClass.ProcessQuery(id);
+				Logger.Info(String.Format("Записьданных по точке {0} - {1} ", dateStart.ToString("dd.MM.yyyy HH:mm"), dateEnd.ToString("dd.MM.yyyy HH:mm")));
+				id = EDSClass.Client.requestShadesWrite(EDSClass.AuthStr, shades.ToArray());
+				ok = EDSClass.ProcessQuery(id);
+			}catch (Exception e) {
+				Logger.Info("ошибка обработки: " + e.ToString());
 			}
-
-			if (!EDSClass.Connected) {
-				EDSClass.Connect();
-			}
-
-			Logger.Info(String.Format("Удаление записей по точке {0} - {1} ",  dateStart.ToString("dd.MM.yyyy HH:mm"), dateEnd.ToString("dd.MM.yyyy HH:mm")));
-			uint id = EDSClass.Client.requestShadesClear(EDSClass.AuthStr, sel.ToArray());
-			bool ok = EDSClass.ProcessQuery(id);
-			Logger.Info(String.Format("Записьданных по точке {0} - {1} ",  dateStart.ToString("dd.MM.yyyy HH:mm"), dateEnd.ToString("dd.MM.yyyy HH:mm")));
-			id = EDSClass.Client.requestShadesWrite(EDSClass.AuthStr, shades.ToArray());
-			ok = EDSClass.ProcessQuery(id);
-
 		}
 
 	}
