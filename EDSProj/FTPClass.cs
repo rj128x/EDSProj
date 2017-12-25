@@ -27,9 +27,11 @@ namespace EDSProj
 
 				//Подключение к ftp
 				client.PassiveMode = !Settings.Single.FTPActive;
+				Logger.Info("try connect");
 				client.Connect(timeout, Settings.Single.FTPServer, Settings.Single.FTPPort);
+				Logger.Info("try login");
 				client.Login(timeout, Settings.Single.FTPUser, Settings.Single.FTPPassword);
-
+				Logger.Info("login");
 				FileInfo fi = new FileInfo(fileName);
 
 
@@ -49,6 +51,40 @@ namespace EDSProj
 				//MailClass.SendTextMail(String.Format("Ошибка при отправке отчета НПРЧ {0} ", fileName), e.ToString());
 			}
 			Logger.Info("Отправка завершена: " + ok.ToString());
+			return ok;
+		}
+
+		public static bool copyFolder() {
+			bool ok = true;
+			try {
+				DirectoryInfo dir = new DirectoryInfo(Settings.Single.AOLocalDir);
+				FileInfo[] files = dir.GetFiles();
+				foreach (FileInfo file in files) {
+					try {
+						Logger.Info("Копирование файла " + file.FullName);
+						FtpClient client = new FtpClient();
+						int timeout = 10000;
+						//Подключение к ftp
+						client.PassiveMode = !Settings.Single.FTPAOActive;
+						Logger.Info("try connect");
+						client.Connect(timeout, Settings.Single.FTPAOServer, Settings.Single.FTPAOPort);
+						Logger.Info("try login");
+						client.Login(timeout, Settings.Single.FTPAOUser, Settings.Single.FTPAOPassword);
+						Logger.Info("login");
+
+						client.PutFile(timeout, file.Name, file.FullName);
+
+						client.Disconnect(timeout);
+						file.Delete();
+					} catch (Exception e) {
+						Logger.Info(e.ToString());
+						ok = false;
+					}
+				}
+			} catch (Exception e) {
+				Logger.Info("Ошибка при копировании файлов " + e.ToString());
+				ok = false;
+			}
 			return ok;
 		}
 

@@ -14,9 +14,9 @@ namespace EDSCnsl
 		static void Main(string[] args) {
 			Settings.init("Data/Settings.xml");
 			Logger.InitFileLogger(Settings.Single.LogPath, "pbrExport");
-			Logger.Info(string.Format("Считано аналоговых точек: {0}", EDSPointsClass.AllAnalogPoints.Count));
+			//Logger.Info(string.Format("Считано аналоговых точек: {0}", EDSPointsClass.AllAnalogPoints.Count));
 
-			uint cnt;
+			/*uint cnt;
 			uint total;
 			if (!EDSClass.Connected)
 				EDSClass.Connect();
@@ -25,9 +25,11 @@ namespace EDSCnsl
 			foreach (ReportConfig report in reports) {
 				Console.WriteLine(report.reportDefinitionFile);
 				Console.WriteLine(report.id);				
-			}
+			}*/
 
-			/*GlobalReportRequest req = new GlobalReportRequest();
+			/*if (!EDSClass.Connected)
+				EDSClass.Connect();
+			GlobalReportRequest req = new GlobalReportRequest();
 			req.reportConfigId = 16;			
 			req.dtRef = new Timestamp() { second = EDSClass.toTS(DateTime.Now) };
 
@@ -36,11 +38,25 @@ namespace EDSCnsl
 			Console.WriteLine(ok.ToString());*/
 			
 
+			if (args.Length >= 1) {
+				string task = args[0];
+				task = task.ToLower();
+				switch (task) {
+					case "copy":
+						FTPClass.copyFolder();
+						break;
+					case "import":
+						MCSettings.init("Data/MCSettings.xml");
+						MCServerReader reader = new MCServerReader(DateTime.Now.Date);
+						break;
+				}
+			} else {
+				Console.WriteLine("Ключи командной строки: \r\n import: для импорта ПБР \r\n copy: для копирования файлов на ftp");
+				Console.ReadLine();
+			}
 			
-			Console.ReadLine();
-			/*MCSettings.init("Data/MCSettings.xml");
-			MCServerReader reader = new MCServerReader(DateTime.Now.Date);*/
-
+			
+			//Console.ReadLine();
 		}
 	}
 }

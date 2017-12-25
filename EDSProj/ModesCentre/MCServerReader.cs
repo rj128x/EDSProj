@@ -87,6 +87,7 @@ namespace EDSProj.ModesCentre
 						}
 					}
 				}
+				//return;
 
 				if (ok) {
 					Logger.Info("Зaпись ПБР в Базу");

@@ -59,6 +59,13 @@ namespace EDSProj
 		public string FTPUser { get; set; }
 		public string FTPPassword { get; set; }
 
+		public string AOLocalDir { get; set; }
+		public bool FTPAOActive { get; set; }
+		public string FTPAOServer { get; set; }
+		public int FTPAOPort { get; set; }
+		public string FTPAOUser { get; set; }
+		public string FTPAOPassword { get; set; }
+
 		public static Settings Single { get; protected set; }
 		public static void init(string filename) {
 			try {
