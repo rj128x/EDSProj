@@ -9,6 +9,16 @@ namespace EDSProj
 {
 	public enum EDSReportPeriod { minute, hour, day }
 	public enum EDSReportFunction { avg,max,min,val}
+	public class TechGroupInfo
+	{
+		public string Name { get; set; }
+		public string Desc { get; set; }
+		public int Id { get; set; }
+		public bool Selected { get; set; }
+	}
+
+
+
 	public class EDSClass {
 		public static EDSClass Single { get; protected set; }
 
@@ -18,6 +28,15 @@ namespace EDSProj
 		
 		public static Dictionary<EDSReportPeriod, string> ReportPeriods { get; protected set; }
 		public static Dictionary<EDSReportFunction, string> ReportFunctions { get; protected set; }
+
+		protected static Dictionary<int, TechGroupInfo> _techGroups { get; set; }
+		public static Dictionary<int, TechGroupInfo> TechGroups {
+			get {
+				if (_techGroups == null)
+					_techGroups = Single.getTechGroups();
+				return _techGroups;
+			}
+		}
 		
 		protected EDSClass() {
 			
@@ -138,6 +157,23 @@ namespace EDSProj
 			} while (!finished);
 			//Console.ReadLine();
 			return ok;
+		}
+
+		protected Dictionary<int, TechGroupInfo> getTechGroups() {
+			if (!Connected)
+				Connect();
+			Group[] groups=Client.getTechnologicalGroups(AuthStr);
+			Dictionary<int, TechGroupInfo> Result = new Dictionary<int, TechGroupInfo>();
+			foreach (Group gr in groups) {
+				if (!String.IsNullOrEmpty(gr.desc)) {
+					TechGroupInfo tg = new TechGroupInfo();
+					tg.Id = gr.id;
+					tg.Name = gr.name;
+					tg.Desc = gr.desc;
+					Result.Add(gr.id, tg);
+				}
+			}
+			return Result;
 		}
 
 

@@ -99,7 +99,7 @@ namespace EDSApp
 					foreach (TabularValue val in row.values) {
 						ValuesStr += String.Format("<td align='right'>{0:0.00}</td>", val.value.av);
 					}
-					txt += String.Format("<tr><th>{0}</th>{1}</tr>", dt.ToString("dd.mm.yyyy HH:mm"), ValuesStr);
+					txt += String.Format("<tr><th>{0}</th>{1}</tr>", dt.ToString("dd.MM.yyyy HH:mm"), ValuesStr);
 				}
 				txt += "</table></html>";
 

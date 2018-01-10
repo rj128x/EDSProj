@@ -24,16 +24,38 @@ namespace EDSApp
 	{
 		public List<EDSPointInfo> SelectedPoints;
 		public List<EDSPointInfo> FilteredPoints;
+		public List<TechGroupInfo> TechGroups;
 		public SelectPointsControl() {
 			InitializeComponent();
-			
+
 		}
 
 		public void init() {
 			SelectedPoints = new List<EDSPointInfo>();
 			FilteredPoints = EDSPointsClass.AllAnalogPoints.Values.ToList();
+			TechGroups = EDSClass.TechGroups.Values.ToList();
 			lbPoints.ItemsSource = FilteredPoints;
 			lbSelPoints.ItemsSource = SelectedPoints;
+			lbGroups.ItemsSource = TechGroups;
+			RefreshSelection("");
+		}
+
+		public void RefreshSelection(string text) {
+			FilteredPoints.Clear();
+			Regex regex = new Regex(text);
+			foreach (EDSPointInfo point in EDSPointsClass.AllAnalogPoints.Values) {
+				foreach (TechGroupInfo tg in TechGroups) {
+					if (FilteredPoints.Contains(point))
+						continue;
+					if (tg.Selected) {
+						if (point.Groups.Contains(tg.Id)) {
+							if (regex.Match(point.FullName).Success)
+								FilteredPoints.Add(point);
+						}
+					}
+				}
+			}
+			lbPoints.Items.Refresh();
 		}
 
 		private void lbPoints_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
@@ -59,15 +81,16 @@ namespace EDSApp
 
 		private void txtFilter_KeyUp(object sender, KeyEventArgs e) {
 			try {
-				string str = txtFilter.Text;
-				FilteredPoints.Clear();
-				Regex regex = new Regex(str);
-				foreach (EDSPointInfo point in EDSPointsClass.AllAnalogPoints.Values) {
-					if (regex.Match(point.FullName).Success)
-						FilteredPoints.Add(point);
-				}
-				lbPoints.Items.Refresh();
+				RefreshSelection(txtFilter.Text);
 			} catch { }
+		}
+
+		private void CheckBox_Checked(object sender, RoutedEventArgs e) {
+			RefreshSelection(txtFilter.Text);
+		}
+
+		private void CheckBox_Unchecked(object sender, RoutedEventArgs e) {
+			RefreshSelection(txtFilter.Text);
 		}
 	}
 }

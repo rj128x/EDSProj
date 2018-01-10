@@ -10,24 +10,54 @@ namespace AISImport
 {
 	class Program
 	{
+		protected static DateTime GetDate(string arg) {
+			int val = 0;
+			bool isInt = int.TryParse(arg, out val);			
+			if (isInt) {
+				return DateTime.Now.Date.AddHours(DateTime.Now.Hour).AddHours(-val);
+			} else {
+				bool isDate;
+				DateTime date = DateTime.Now.Date.AddHours(DateTime.Now.Hour);
+				isDate = DateTime.TryParse(arg, out date);
+				if (isDate) {
+					return date;
+				} else {
+					return date = DateTime.Now.Date.AddHours(DateTime.Now.Hour);
+				}
+			}
+		}
+
 		static void Main(string[] args) {
 			Settings.init("Data/Settings.xml");
 			Logger.InitFileLogger(Settings.Single.LogPath, "aisImport");
-			AIS_OLD ais = new AIS_OLD();
+			//AIS_OLD ais = new AIS_OLD();
+			AIS_NEW ais = new AIS_NEW();
 			ais.readPoints();
 
-			DateTime date = DateTime.Parse("01.12.2017");
-			DateTime dateEnd = DateTime.Parse("02.12.2017");
-			if (args.Length == 2) {
-				date = DateTime.Parse(args[0]);
-				dateEnd = DateTime.Parse(args[1]);
+			/*refreshData(DateTime.Parse("01.01.2008"), DateTime.Parse("01.01.2018"));
+			return;*/
+			DateTime date = DateTime.Now.Date.AddHours(DateTime.Now.Hour-12);
+			//date = DateTime.Parse("01.01.2018");
+			DateTime dateEnd = DateTime.Now.Date.AddHours(DateTime.Now.Hour);
+			if (args.Length == 2) {	
+				date = GetDate(args[0]);
+				dateEnd = GetDate(args[1]);
 			}
 
 			while (date < dateEnd) {
 				ais.readDataFromDB(date,date.AddHours(12));
 				date = date.AddHours(12);
 			}
+		}
 
+		public static void refreshData(DateTime dateStart,DateTime dateEnd) {
+			AIS_OLD ais = new AIS_OLD();
+			ais.readPoints();
+			DateTime date = dateStart.AddHours(0);
+			while (date < dateEnd) {
+				ais.refreshDataInEDS(date, date.AddHours(24*10));
+				date = date.AddHours(24*10);
+			}
 		}
 	}
 }
