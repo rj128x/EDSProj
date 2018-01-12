@@ -45,8 +45,10 @@ namespace AISImport
 			}
 
 			while (date < dateEnd) {
-				ais.readDataFromDB(date,date.AddHours(12));
-				date = date.AddHours(12);
+				DateTime de = date.AddHours(12);
+				de = de > dateEnd ? dateEnd : de;
+				ais.readDataFromDB(date,de);
+				date = de.AddHours(0);
 			}
 		}
 

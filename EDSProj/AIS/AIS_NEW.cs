@@ -123,7 +123,7 @@ namespace EDSProj.AIS
 
 					sel.Add(new ShadeSelector() {
 						period = new TimePeriod() {
-							from = new Timestamp() { second = EDSClass.toTS(dateStart.AddHours(2).AddMinutes(-30)) },
+							from = new Timestamp() { second = EDSClass.toTS(dateStart.AddHours(2).AddMinutes(30)) },
 							till = new Timestamp() { second = EDSClass.toTS(dateEnd.AddHours(2).AddMinutes(-30)) }
 						},
 						pointId = new PointId() {

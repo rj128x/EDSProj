@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>6e852a36-84ae-43af-a5cd-095cbaa9d01c</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>EDSPython.py</StartupFile>
+    <StartupFile>TestRashod.py</StartupFile>
     <SearchPath>..\..\..\..\Program Files\EDS\Api</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -24,9 +24,18 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="EDSPython.py" />
+    <Compile Include="Rashod.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="TestRashod.py">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="Global|PythonCore|2.7-32" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="calc\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
