@@ -35,7 +35,7 @@ namespace EDSProj.AIS
 					int obj = Int32.Parse(codeParts[0]);
 					int item = Int32.Parse(codeParts[1]);
 
-					if (obj > 0 && item > 0 && !String.IsNullOrEmpty(iess) && !(desc.Contains("1 мин"))) {
+					if (obj >= 0 && item > 0 && !String.IsNullOrEmpty(iess) && !(desc.Contains("1 мин"))) {
 						AISPointInfo point = new AISPointInfo();
 						point.EDSPoint = iess;
 						point.Obj = obj;
@@ -49,6 +49,10 @@ namespace EDSProj.AIS
 							point.DBName = "PiramidaTU";
 						}
 						if (obj == 1) {
+							point.DBName = "Piramida3000";
+							point.ObjType = 2;
+						}
+						if (obj == 0) {
 							point.DBName = "Piramida3000";
 							point.ObjType = 2;
 						}
@@ -77,6 +81,7 @@ namespace EDSProj.AIS
 				dates.Add(dt);
 				dt = dt.AddMinutes(30);
 			}
+
 			try {
 				foreach (AISPointInfo point in AISPoints) {
 					SqlConnection con = getConnection(point.DBName);
@@ -130,7 +135,7 @@ namespace EDSProj.AIS
 
 					sel.Add(new ShadeSelector() {
 						period = new TimePeriod() {
-							from = new Timestamp() { second = EDSClass.toTS(dateStart.AddHours(2).AddMinutes(-30)) },
+							from = new Timestamp() { second = EDSClass.toTS(dateStart.AddHours(2).AddMinutes(30)) },
 							till = new Timestamp() { second = EDSClass.toTS(dateEnd.AddHours(2).AddMinutes(-30)) }
 						},
 						pointId = new PointId() {

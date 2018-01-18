@@ -26,7 +26,7 @@ namespace EDSProj.AIS
 					int obj = Int32.Parse(codeParts[0]);
 					int item = Int32.Parse(codeParts[1]);
 
-					if (obj > 0 && item > 0 && !String.IsNullOrEmpty(iess) && !(desc.Contains("1 мин"))) {
+					if (obj >= 0 && item > 0 && !String.IsNullOrEmpty(iess) && !(desc.Contains("1 мин"))) {
 						AISPointInfo point = new AISPointInfo();
 						point.EDSPoint = iess;
 						point.Obj = obj;
@@ -39,11 +39,10 @@ namespace EDSProj.AIS
 						}
 						if (obj == 8739 || obj == 8740) {
 							point.DBName = "PiramidaTU";
-						}
-						if (obj == 1) {
-							point.DBName = "Piramida3000";
-							point.ObjType = 2;
 						}*/
+						if (obj == 0) {
+							point.ObjType = 2;
+						}
 						AISPoints.Add(point);
 					}
 				} catch { }

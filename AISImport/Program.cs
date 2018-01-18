@@ -37,19 +37,58 @@ namespace AISImport
 			/*refreshData(DateTime.Parse("01.01.2008"), DateTime.Parse("01.01.2018"));
 			return;*/
 			DateTime date = DateTime.Now.Date.AddHours(DateTime.Now.Hour-12);
-			//date = DateTime.Parse("01.01.2018");
+			
 			DateTime dateEnd = DateTime.Now.Date.AddHours(DateTime.Now.Hour);
+			
 			if (args.Length == 2) {	
 				date = GetDate(args[0]);
 				dateEnd = GetDate(args[1]);
 			}
 
+			/*date = DateTime.Parse("01.01.2018");
+			dateEnd = DateTime.Parse("18.01.2018 12:00");*/
 			while (date < dateEnd) {
 				DateTime de = date.AddHours(12);
+				de = de > dateEnd ? dateEnd : de;
+				ais.readDataFromDB(date, de);
+				date = de.AddHours(0);
+			}
+
+			/*date = DateTime.Parse("30.03.2008");
+			dateEnd = DateTime.Parse("31.03.2008");
+			while (date < dateEnd) {
+				DateTime de = date.AddHours(1);
 				de = de > dateEnd ? dateEnd : de;
 				ais.readDataFromDB(date,de);
 				date = de.AddHours(0);
 			}
+
+			date = DateTime.Parse("29.03.2009");
+			dateEnd = DateTime.Parse("30.03.2009");
+			while (date < dateEnd) {
+				DateTime de = date.AddHours(1);
+				de = de > dateEnd ? dateEnd : de;
+				ais.readDataFromDB(date, de);
+				date = de.AddHours(0);
+			}
+
+			date = DateTime.Parse("28.03.2010");
+			dateEnd = DateTime.Parse("29.03.2010");
+			while (date < dateEnd) {
+				DateTime de = date.AddHours(1);
+				de = de > dateEnd ? dateEnd : de;
+				ais.readDataFromDB(date, de);
+				date = de.AddHours(0);
+			}
+
+			date = DateTime.Parse("27.03.2011");
+			dateEnd = DateTime.Parse("28.03.2011");
+			while (date < dateEnd) {
+				DateTime de = date.AddHours(1);
+				de = de > dateEnd ? dateEnd : de;
+				ais.readDataFromDB(date, de);
+				date = de.AddHours(0);
+			}*/
 		}
 
 		public static void refreshData(DateTime dateStart,DateTime dateEnd) {
