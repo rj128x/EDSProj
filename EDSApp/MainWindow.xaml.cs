@@ -31,5 +31,10 @@ namespace EDSApp
 			ReportWindow win = new EDSApp.ReportWindow();
 			win.Show();
 		}
+
+		private void buttonWater_Click(object sender, RoutedEventArgs e) {
+			WaterWindow win = new WaterWindow();
+			win.Show();
+		}
 	}
 }

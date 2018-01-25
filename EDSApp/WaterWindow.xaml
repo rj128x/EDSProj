@@ -1,0 +1,83 @@
+﻿<Window x:Class="EDSApp.WaterWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:EDSApp"
+        mc:Ignorable="d"
+        Title="WaterWin" Height="300" Width="400">
+    <Grid>
+        <Grid Margin="0,20,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="110"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="170"/>
+                    <ColumnDefinition Width="170"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Width="100" Text="ГГ№"/>
+                        <TextBox Name="txtGG" Width="50"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Width="100" Text="Напор"/>
+                        <TextBox Name="txtHGG" Width="50"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Width="100" Text="Мощность"/>
+                        <TextBox Name="txtPGG" Width="50"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Width="100" Text="Расход"/>
+                        <TextBox Name="txtQGG" Width="50"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Button Name="btnCalcGGP" Content="Считать P" Width="70" Click="btnCalcGGP_Click"/>
+                        <Button Name="btnCalcGGQ" Content="Считать Q" Width="70" Click="btnCalcGGQ_Click"/>
+                    </StackPanel>
+                </StackPanel>
+                <StackPanel Grid.Column="1">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Width="100" Text="Напор"/>
+                        <TextBox Name="txtHGES" Width="50"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Width="100" Text="Мощность"/>
+                        <TextBox Name="txtPGES" Width="50"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Width="100" Text="Расход"/>
+                        <TextBox Name="txtQGES" Width="50"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Button Name="btnCalcGESP" Content="Считать P" Width="70" Click="btnCalcGESP_Click"/>
+                        <Button Name="btnCalcGESQ" Content="Считать Q" Width="70" Click="btnCalcGESQ_Click"/>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Width="100" Text="Напор"/>
+                        <TextBox Name="txtHGES_RUSA" Width="50"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Width="100" Text="Мощность"/>
+                        <TextBox Name="txtPGES_RUSA" Width="50"/>
+                    </StackPanel>
+                    <Button Name="btnRUSA" Content="РУСА" Click="btnRUSA_Click"/>
+                </StackPanel>
+                <WebBrowser Grid.Column="1" Name="wbResult"/>
+            </Grid>
+            
+        </Grid>
+        
+    </Grid>
+</Window>
