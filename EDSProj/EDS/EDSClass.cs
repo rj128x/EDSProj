@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace EDSProj
 {
-	public enum EDSReportPeriod { minute, hour, day }
-	public enum EDSReportFunction { avg,max,min,val}
+	public enum EDSReportPeriod { minute, hour, day, month }
+	public enum EDSReportFunction { avg,max,min,val,vyrab}
 	public class TechGroupInfo
 	{
 		public string Name { get; set; }
@@ -97,9 +97,11 @@ namespace EDSProj
 			ReportPeriods.Add(EDSReportPeriod.minute, "Минута");
 			ReportPeriods.Add(EDSReportPeriod.hour, "Час");
 			ReportPeriods.Add(EDSReportPeriod.day, "Сутки");
+			ReportPeriods.Add(EDSReportPeriod.month, "Месяц");
 
 			ReportFunctions = new Dictionary<EDSReportFunction, string>();
 			ReportFunctions.Add(EDSReportFunction.avg, "Среднее");
+			ReportFunctions.Add(EDSReportFunction.vyrab, "Выработка");
 			ReportFunctions.Add(EDSReportFunction.min, "Минимум");
 			ReportFunctions.Add(EDSReportFunction.max, "Максимум");
 			ReportFunctions.Add(EDSReportFunction.val, "Значение");
@@ -109,6 +111,9 @@ namespace EDSProj
 			string name = "AVG";
 			switch (func) {
 				case EDSReportFunction.avg:
+					name = "AVG";
+					break;
+				case EDSReportFunction.vyrab:
 					name = "AVG";
 					break;
 				case EDSReportFunction.val:

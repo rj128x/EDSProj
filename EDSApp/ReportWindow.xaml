@@ -17,8 +17,10 @@
                 <RowDefinition Height="10"/>
             </Grid.RowDefinitions>
             <StackPanel Grid.Row="0" Grid.Column="0">
-                <Calendar Name="clndFrom"/>
-                <Calendar Name="clndTo"/>
+                <DatePicker Name="clndFrom"/>
+                <DatePicker Name="clndTo"/>
+                <CheckBox Name="chbMsk" Content="Московские сутки" IsChecked="False"/>                
+
                 <ComboBox Name="cmbPeriod" DisplayMemberPath="Value" SelectedValuePath="Key"/>
                 <ComboBox Name="cmbFunction" DisplayMemberPath="Value" SelectedValuePath="Key"/>
                 <Button Content="Сформировать" Name="btnCreate" Click="btnCreate_Click"/>

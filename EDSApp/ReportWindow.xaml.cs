@@ -1,4 +1,5 @@
 ﻿using EDSProj;
+using EDSProj.EDS;
 using EDSProj.EDSWebService;
 using System;
 using System.Collections.Generic;
@@ -26,6 +27,8 @@ namespace EDSApp
 			cntrlSelectPoints.init();
 			cmbPeriod.ItemsSource = EDSClass.ReportPeriods;
 			cmbFunction.ItemsSource = EDSClass.ReportFunctions;
+			clndFrom.SelectedDate = DateTime.Now.Date.AddDays(-1);
+			clndTo.SelectedDate = DateTime.Now.Date;
 		}
 
 		private void btnCreate_Click(object sender, RoutedEventArgs e) {
@@ -54,60 +57,45 @@ namespace EDSApp
 
 			DateTime dtStart = clndFrom.SelectedDate.Value;
 			DateTime dtEnd = clndTo.SelectedDate.Value;
-
-			TabularRequest req = new TabularRequest();
-			req.period = new TimePeriod() {
-				from = new Timestamp() { second = EDSClass.toTS(dtStart) },
-				till = new Timestamp() { second = EDSClass.toTS(dtEnd) }
-			};
-
 			EDSReportFunction func = (EDSReportFunction)cmbFunction.SelectedValue;
 			EDSReportPeriod period = (EDSReportPeriod)cmbPeriod.SelectedValue;
-			List<TabularRequestItem> list = new List<TabularRequestItem>();
+
+			EDSReport report = new EDSReport(dtStart, dtEnd, period, chbMsk.IsChecked.Value);
+
 			foreach (EDSPointInfo point in cntrlSelectPoints.SelectedPoints) {
-				list.Add(new TabularRequestItem() {
-					function = EDSClass.getReportFunctionName(func),
-					pointId = new PointId() { iess = point.IESS }
-				});
+				report.addRequestField(point, func);
 			}
 
-			req.step = new TimeDuration() { seconds = EDSClass.getPeriodSeconds(period) };
-			req.items = list.ToArray();
+			report.ReadData();
 
-			if (!EDSClass.Connected)
-				EDSClass.Connect();
-			if (EDSClass.Connected) {
-				uint id = EDSClass.Client.requestTabular(EDSClass.AuthStr, req);
-				TabularRow[] rows;
-				EDSClass.ProcessQuery(id);
-				PointId[] points = EDSClass.Client.getTabular(EDSClass.AuthStr, id, out rows);
+			String header = "";
+			foreach (EDSReportRequestRecord rec in report.RequestData.Values) {
+				header += String.Format("<th>{0}</th>", rec.Point.Desc);
+			}
 
-				String header = "";
-				foreach (PointId pnt in points) {
-					header+=String.Format("<th>{0}</th>", EDSPointsClass.AllAnalogPoints[pnt.iess].Desc);
-				}
-
-				String txt = string.Format(@"<html>
+			String txt = string.Format(@"<html>
 				<head>
 					<meta http-equiv=""Content-Type"" content=""text/html; charset=UTF-8"" />
             </head>
 				<table border='1'><tr><th>точка</th>{0}</tr>", header);
 
-				foreach (TabularRow row in rows) {
-					DateTime dt = EDSClass.fromTS(row.ts.second);
-					string ValuesStr = "";
-					foreach (TabularValue val in row.values) {
-						ValuesStr += String.Format("<td align='right'>{0:0.00}</td>", val.value.av);
-					}
-					txt += String.Format("<tr><th>{0}</th>{1}</tr>", dt.ToString("dd.MM.yyyy HH:mm"), ValuesStr);
+			foreach (KeyValuePair<DateTime, Dictionary<string, double>> de in report.ResultData) {
+				DateTime dt = de.Key;
+				string ValuesStr = "";
+				foreach (double val in de.Value.Values) {
+					ValuesStr += String.Format("<td align='right'>{0:0.00}</td>", val);
 				}
-				txt += "</table></html>";
-
-				ReportResultWindow win = new ReportResultWindow();
-				win.wbResult.NavigateToString(txt);
-				win.Show();
-
+				txt += String.Format("<tr><th>{0}</th>{1}</tr>", dt.ToString("dd.MM.yyyy HH:mm"), ValuesStr);
 			}
+			txt += "</table></html>";
+
+
+
+			ReportResultWindow win = new ReportResultWindow();
+			win.wbResult.NavigateToString(txt);
+			win.Show();
+
 		}
 	}
 }
+

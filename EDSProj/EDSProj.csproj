@@ -71,6 +71,7 @@
     <Compile Include="AIS\AIS_OLD.cs" />
     <Compile Include="EDS\EDSClass.cs" />
     <Compile Include="EDS\EDSPointsClass.cs" />
+    <Compile Include="EDS\EDSReport.cs" />
     <Compile Include="FTPClass.cs" />
     <Compile Include="Impersonator.cs" />
     <Compile Include="ModesCentre\MCPBRData.cs" />

@@ -15,11 +15,15 @@ namespace EDSProj
 		public string TG { get; set; }
 		public List<int> Groups { get; set; }
 		public string FullName { get; set; }
+		public string AC { get; set; }
+		public bool IsShade { get; set; }
 
-		public EDSPointInfo(string iess, string desc,string tg) {
+		public EDSPointInfo(string iess, string desc,string tg,string ac) {
 			this.IESS = iess;
 			this.Desc = desc;
 			this.TG = tg;
+			this.AC = ac;
+			this.IsShade = ac.ToLower().Contains("shade");
 			Groups = new List<int>();
 			try {
 				string[] groups = tg.Split(new char[] { ';' });				
@@ -53,15 +57,16 @@ namespace EDSProj
 					if (!line.Contains("POINT"))
 						continue;
 					try {
-						Regex regex = new Regex(@"RT=(\w+).+IESS='([^']+).+DESC='([^']+).+TG='([^']+)");
+						Regex regex = new Regex(@"RT=(\w+).+IESS='([^']+).+DESC='([^']+).+AC='([^']+).+TG='([^']+)");
 						Match match = regex.Match(line);
 						if (match.Success) {
 							string type = match.Groups[1].Value.ToLower();
 							string iess = match.Groups[2].Value;
 							string desc = match.Groups[3].Value;
-							string tg = match.Groups[4].Value;
+							string ac = match.Groups[4].Value;
+							string tg = match.Groups[5].Value;
 							if (type == "analog" || type == "double" ) {
-								_allAnalogPoints.Add(iess,new EDSPointInfo(iess, desc,tg));
+								_allAnalogPoints.Add(iess,new EDSPointInfo(iess, desc,tg,ac));
 							}
 						}
 					} catch (Exception e) {
