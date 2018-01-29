@@ -5,9 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EDSApp"
         mc:Ignorable="d"
-        Title="ReportWindow" Height="700" Width="1000">
+        Title="ReportWindow" Height="700" Width="1100">
     <Grid>
-        <Grid>
+        <Grid Margin="0,20,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="200"/>
                 <ColumnDefinition Width="*"/>
@@ -16,15 +16,17 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="10"/>
             </Grid.RowDefinitions>
-            <StackPanel Grid.Row="0" Grid.Column="0">
-                <DatePicker Name="clndFrom"/>
-                <DatePicker Name="clndTo"/>
-                <CheckBox Name="chbMsk" Content="Московские сутки" IsChecked="False"/>                
+            <Border BorderBrush="#FF1A23E2" BorderThickness="1,1,1,1" CornerRadius="4" Height="115"  VerticalAlignment="Top">
+                <StackPanel Grid.Row="0" Grid.Column="0">
+                    <DatePicker Name="clndFrom"/>
+                    <DatePicker Name="clndTo"/>
+                    <CheckBox Name="chbMsk" Content="Московские сутки" IsChecked="False"/>
 
-                <ComboBox Name="cmbPeriod" DisplayMemberPath="Value" SelectedValuePath="Key"/>
-                <ComboBox Name="cmbFunction" DisplayMemberPath="Value" SelectedValuePath="Key"/>
-                <Button Content="Сформировать" Name="btnCreate" Click="btnCreate_Click"/>
-            </StackPanel>
+                    <ComboBox Name="cmbPeriod" DisplayMemberPath="Value" SelectedValuePath="Key"/>
+
+                    <Button Content="Сформировать" Name="btnCreate" Click="btnCreate_Click"/>
+                </StackPanel>
+            </Border>
             <local:SelectPointsControl x:Name="cntrlSelectPoints" Grid.Column="1" Grid.Row="0" />
         </Grid>
     </Grid>

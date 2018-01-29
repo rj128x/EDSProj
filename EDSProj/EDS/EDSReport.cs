@@ -11,11 +11,15 @@ namespace EDSProj.EDS
 	public class EDSReportRequestRecord
 	{
 		public EDSPointInfo Point { get; set; }
-		public EDSReportFunction Function { get; set; }
-		public string ID {
-			get {
-				return String.Format("{0} [{1}]", Point.IESS, Function);
-			}
+		public EDSReportFunction Function { get; set; }		
+		public string Id { get; }
+		public string Desc { get; }
+
+		public EDSReportRequestRecord(EDSPointInfo point, EDSReportFunction func) {
+			this.Point = point;
+			this.Function = func;
+			this.Id = String.Format("{0} [{1}]", Point.IESS, Function);
+			this.Desc = String.Format("{0} [{1}]", Point.Desc, EDSClass.ReportFunctions[func]);
 		}
 
 	}
@@ -31,10 +35,8 @@ namespace EDSProj.EDS
 
 		public void addRequestField(EDSPointInfo point, EDSReportFunction func) {
 			try {
-				EDSReportRequestRecord rec = new EDSReportRequestRecord();
-				rec.Point = point;
-				rec.Function = func;
-				RequestData.Add(rec.ID, rec);
+				EDSReportRequestRecord rec = new EDSReportRequestRecord(point,func);				
+				RequestData.Add(rec.Id, rec);
 			} catch (Exception e) {
 				Logger.Info(e.ToString());
 			}

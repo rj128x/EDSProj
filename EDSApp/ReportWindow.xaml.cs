@@ -26,9 +26,10 @@ namespace EDSApp
 			InitializeComponent();
 			cntrlSelectPoints.init();
 			cmbPeriod.ItemsSource = EDSClass.ReportPeriods;
-			cmbFunction.ItemsSource = EDSClass.ReportFunctions;
+			
 			clndFrom.SelectedDate = DateTime.Now.Date.AddDays(-1);
 			clndTo.SelectedDate = DateTime.Now.Date;
+			cmbPeriod.SelectedValue = EDSReportPeriod.hour;
 		}
 
 		private void btnCreate_Click(object sender, RoutedEventArgs e) {
@@ -40,10 +41,10 @@ namespace EDSApp
 				MessageBox.Show("Выберите дату конца");
 				return;
 			}
-			if (cmbFunction.SelectedItem == null) {
+			/*if (cmbFunction.SelectedItem == null) {
 				MessageBox.Show("Выберите функцию");
 				return;
-			}
+			}*/
 			if (cmbPeriod.SelectedItem == null) {
 				MessageBox.Show("Выберите период");
 				return;
@@ -57,20 +58,21 @@ namespace EDSApp
 
 			DateTime dtStart = clndFrom.SelectedDate.Value;
 			DateTime dtEnd = clndTo.SelectedDate.Value;
-			EDSReportFunction func = (EDSReportFunction)cmbFunction.SelectedValue;
+			//EDSReportFunction func = (EDSReportFunction)cmbFunction.SelectedValue;
+			
 			EDSReportPeriod period = (EDSReportPeriod)cmbPeriod.SelectedValue;
 
 			EDSReport report = new EDSReport(dtStart, dtEnd, period, chbMsk.IsChecked.Value);
 
-			foreach (EDSPointInfo point in cntrlSelectPoints.SelectedPoints) {
-				report.addRequestField(point, func);
+			foreach (EDSReportRequestRecord rec in cntrlSelectPoints.SelectedPoints) {
+				report.addRequestField(rec.Point, rec.Function);
 			}
 
 			report.ReadData();
 
 			String header = "";
 			foreach (EDSReportRequestRecord rec in report.RequestData.Values) {
-				header += String.Format("<th>{0}</th>", rec.Point.Desc);
+				header += String.Format("<th>{0}</th>", rec.Desc);
 			}
 
 			String txt = string.Format(@"<html>

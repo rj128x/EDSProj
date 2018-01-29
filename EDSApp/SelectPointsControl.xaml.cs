@@ -1,4 +1,5 @@
 ﻿using EDSProj;
+using EDSProj.EDS;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,16 +23,17 @@ namespace EDSApp
 	/// </summary>
 	public partial class SelectPointsControl : UserControl
 	{
-		public List<EDSPointInfo> SelectedPoints;
+		public List<EDSReportRequestRecord> SelectedPoints;
 		public List<EDSPointInfo> FilteredPoints;
 		public List<TechGroupInfo> TechGroups;
 		public SelectPointsControl() {
 			InitializeComponent();
-
+			cmbFunction.ItemsSource = EDSClass.ReportFunctions;
+			cmbFunction.SelectedValue = EDSReportFunction.avg;
 		}
 
 		public void init() {
-			SelectedPoints = new List<EDSPointInfo>();
+			SelectedPoints = new List<EDSReportRequestRecord>();
 			FilteredPoints = EDSPointsClass.AllAnalogPoints.Values.ToList();
 			TechGroups = EDSClass.TechGroups.Values.ToList();
 			lbPoints.ItemsSource = FilteredPoints;
@@ -61,8 +63,12 @@ namespace EDSApp
 		private void lbPoints_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
 			try {
 				EDSPointInfo selPoint = lbPoints.SelectedItem as EDSPointInfo;
-				if (!SelectedPoints.Contains(selPoint)) {
-					SelectedPoints.Add(selPoint);
+				EDSReportFunction func = (EDSReportFunction)cmbFunction.SelectedValue;
+				EDSReportRequestRecord rec = new EDSReportRequestRecord(selPoint,func);
+
+				bool exists=SelectedPoints.Exists(req => req.Id == rec.Id);
+				if (!exists) {
+					SelectedPoints.Add(rec);
 					lbSelPoints.Items.Refresh();
 				}
 			} catch { }
@@ -71,9 +77,9 @@ namespace EDSApp
 
 		private void lbSelPoints_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
 			try {
-				EDSPointInfo selPoint = lbSelPoints.SelectedItem as EDSPointInfo;
-				if (SelectedPoints.Contains(selPoint)) {
-					SelectedPoints.Remove(selPoint);
+				EDSReportRequestRecord rec = lbSelPoints.SelectedItem as EDSReportRequestRecord;
+				if (SelectedPoints.Contains(rec)) {
+					SelectedPoints.Remove(rec);
 					lbSelPoints.Items.Refresh();
 				}
 			} catch { }
