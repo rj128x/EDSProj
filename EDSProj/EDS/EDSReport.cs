@@ -11,7 +11,7 @@ namespace EDSProj.EDS
 	public class EDSReportRequestRecord
 	{
 		public EDSPointInfo Point { get; set; }
-		public EDSReportFunction Function { get; set; }		
+		public EDSReportFunction Function { get; set; }
 		public string Id { get; }
 		public string Desc { get; }
 
@@ -38,7 +38,7 @@ namespace EDSProj.EDS
 
 		public void addRequestField(EDSPointInfo point, EDSReportFunction func) {
 			try {
-				EDSReportRequestRecord rec = new EDSReportRequestRecord(point,func);				
+				EDSReportRequestRecord rec = new EDSReportRequestRecord(point, func);
 				RequestData.Add(rec.Id, rec);
 			} catch (Exception e) {
 				Logger.Info(e.ToString());
@@ -62,6 +62,9 @@ namespace EDSProj.EDS
 			while (date < DateEnd) {
 				DateTime de = date.AddHours(0);
 				switch (Period) {
+					case EDSReportPeriod.sec:
+						de = date.AddSeconds(1);
+						break;
 					case EDSReportPeriod.minute:
 						de = date.AddMinutes(1);
 						break;
@@ -82,7 +85,7 @@ namespace EDSProj.EDS
 				date = de.AddHours(0);
 			}
 
-			
+
 			List<TabularRequestItem> list = new List<TabularRequestItem>();
 			foreach (EDSReportRequestRecord rec in RequestData.Values) {
 				list.Add(new TabularRequestItem() {
@@ -92,37 +95,56 @@ namespace EDSProj.EDS
 				});
 			}
 
-			TabularRequest req = new TabularRequest();
-			req.period = new TimePeriod() {
-				from = new Timestamp() { second = EDSClass.toTS(DateStart) },
-				till = new Timestamp() { second = EDSClass.toTS(DateEnd) }
-			};
+
 
 			if (!EDSClass.Connected)
 				EDSClass.Connect();
 			if (EDSClass.Connected) {
 				if (Period != EDSReportPeriod.month) {
-					req.step = new TimeDuration() { seconds = EDSClass.getPeriodSeconds(Period) };
-					req.items = list.ToArray();
-					uint id = EDSClass.Client.requestTabular(EDSClass.AuthStr, req);
-					TabularRow[] rows;
-					bool ok= await EDSClass.ProcessQueryAsync(id);
-					PointId[] points = EDSClass.Client.getTabular(EDSClass.AuthStr, id, out rows);
-					List<string> keys = RequestData.Keys.ToList();
-
-					foreach (TabularRow row in rows) {
-
-						DateTime dt = EDSClass.fromTS(row.ts.second);
-						for (int i = 0; i < row.values.Count(); i++) {
-							double val = (double)row.values[i].value.av;
-							PointId point = points[i];
-							string resId = keys[i];
-							EDSReportRequestRecord request = RequestData[resId];
-							if (request.Function == EDSReportFunction.vyrab && Period == EDSReportPeriod.day) {
-								val *= 24;
-							}
-							ResultData[dt][resId] = val;
+					List<DateTime> dates = ResultData.Keys.ToList();
+					DateTime ds = DateStart.AddHours(0);
+					DateTime de = DateStart.AddHours(1);
+					while (ds < DateEnd) {
+						/*int i0 = dates.IndexOf(ds);
+						int i1 = i0 + 100;
+						de = i1 < dates.Count ? dates[i1] : DateEnd;*/
+						de = de.AddDays(5);
+						try {
+							de = dates.First(d => d >= de);
+						} catch {
+							de = DateEnd;
 						}
+						
+						EDSClass.Single.GlobalInfo = String.Format("{0}-{1}", ds.ToShortDateString(), de.ToShortDateString());
+
+						TabularRequest req = new TabularRequest();
+						req.period = new TimePeriod() {
+							from = new Timestamp() { second = EDSClass.toTS(ds) },
+							till = new Timestamp() { second = EDSClass.toTS(de) }
+						};
+
+						req.step = new TimeDuration() { seconds = EDSClass.getPeriodSeconds(Period) };
+						req.items = list.ToArray();
+						uint id = EDSClass.Client.requestTabular(EDSClass.AuthStr, req);
+						TabularRow[] rows;
+						bool ok = await EDSClass.ProcessQueryAsync(id);
+						PointId[] points = EDSClass.Client.getTabular(EDSClass.AuthStr, id, out rows);
+						List<string> keys = RequestData.Keys.ToList();
+
+						foreach (TabularRow row in rows) {
+							DateTime dt = EDSClass.fromTS(row.ts.second);
+							for (int i = 0; i < row.values.Count(); i++) {
+								double val = (double)row.values[i].value.av;
+								PointId point = points[i];
+								string resId = keys[i];
+								EDSReportRequestRecord request = RequestData[resId];
+								if (request.Function == EDSReportFunction.vyrab && Period == EDSReportPeriod.day) {
+									val *= 24;
+								}
+								ResultData[dt][resId] = val;
+							}
+						}
+						ds = de.AddHours(0);
 					}
 
 
@@ -130,7 +152,7 @@ namespace EDSProj.EDS
 					DateTime ds = DateStart.AddHours(0);
 					while (ds < DateEnd) {
 						DateTime de = ds.AddMonths(1);
-
+						TabularRequest req = new TabularRequest();
 						req.period = new TimePeriod() {
 							from = new Timestamp() { second = EDSClass.toTS(ds) },
 							till = new Timestamp() { second = EDSClass.toTS(de) }
@@ -142,7 +164,7 @@ namespace EDSProj.EDS
 						req.items = list.ToArray();
 						uint id = EDSClass.Client.requestTabular(EDSClass.AuthStr, req);
 						TabularRow[] rows;
-						bool ok= await EDSClass.ProcessQueryAsync(id);
+						bool ok = await EDSClass.ProcessQueryAsync(id);
 						PointId[] points = EDSClass.Client.getTabular(EDSClass.AuthStr, id, out rows);
 						List<string> keys = RequestData.Keys.ToList();
 

@@ -10,7 +10,7 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace EDSProj
 {
-	public enum EDSReportPeriod { minute, hour, day, month }
+	public enum EDSReportPeriod {sec, minute, hour, day, month }
 	public enum EDSReportFunction { avg, max, min, val, vyrab }
 	public class TechGroupInfo {
 		public string Name { get; set; }
@@ -52,7 +52,7 @@ namespace EDSProj
 		public String GlobalInfo { get {
 				return _globalInfo;
 			}
-			protected set {
+			 set {
 				_globalInfo = value;
 				NotifyChanged("GlobalInfo");
 			}
@@ -61,9 +61,20 @@ namespace EDSProj
 		protected string _connectInfo;
 		public  String ConnectInfo { get {
 				return _connectInfo;
-			} protected set {
+			}  set {
 				_connectInfo = value;
 				NotifyChanged("ConnectInfo");
+			}
+		}
+
+		protected string _processInfo;
+		public String ProcessInfo {
+			get {
+				return _processInfo;
+			}
+			set {
+				_processInfo = value;
+				NotifyChanged("ProcessInfo");
 			}
 		}
 
@@ -125,6 +136,7 @@ namespace EDSProj
 		static EDSClass() {
 			Single = new EDSClass();
 			ReportPeriods = new Dictionary<EDSReportPeriod, string>();
+			ReportPeriods.Add(EDSReportPeriod.sec, "Секунда");
 			ReportPeriods.Add(EDSReportPeriod.minute, "Минута");
 			ReportPeriods.Add(EDSReportPeriod.hour, "Час");
 			ReportPeriods.Add(EDSReportPeriod.day, "Сутки");
@@ -163,6 +175,9 @@ namespace EDSProj
 		public static long getPeriodSeconds(EDSReportPeriod period) {
 			long res = 3600;
 			switch (period) {
+				case EDSReportPeriod.sec:
+					res = 1;
+					break;
 				case EDSReportPeriod.minute:
 					res=60;
 					break;
@@ -188,7 +203,7 @@ namespace EDSProj
 				Single._client.getRequestStatus(Single._authStr, id, out status, out progress, out msg);
 				Logger.Info(String.Format("{3} {0}: {1} ({2})", status, progress * 100, msg, i));
 				ok = status == RequestStatus.REQUESTSUCCESS;
-				Single.GlobalInfo=String.Format("Запрос {3} {0}: {1} ({2})", status, progress * 100, msg, i);
+				Single.ProcessInfo=String.Format("Запрос {0}: {1}% ({2})", msg, progress * 100, i);
 				finished = ok || i >= 100;
 				Thread.Sleep(1000);
 			} while (!finished);
@@ -202,14 +217,15 @@ namespace EDSProj
 			bool ok = false;
 			getRequestStatusRequest req = new getRequestStatusRequest(Single._authStr, id);
 			do {
+				Thread.Sleep(500);
 				i++;
 				getRequestStatusResponse res=await Single._client.getRequestStatusAsync(req);
 				Logger.Info(String.Format("{3} {0}: {1} ({2})", res.status, res.progress * 100, res.message, i));
 				ok = res.status == RequestStatus.REQUESTSUCCESS;
-				Single.GlobalInfo = String.Format("{3} {0}: {1:0.00} ({2})", res.status, res.progress * 100, res.message, i);
-				finished = ok || i >= 100;
+				Single.ProcessInfo = String.Format("Запрос {0}: {1}% ({2})", res.message, res.progress * 100, i);
+				finished = ok || i >= 500;
 				
-				Thread.Sleep(1000);
+				
 			} while (!finished);
 			return ok;
 		}
