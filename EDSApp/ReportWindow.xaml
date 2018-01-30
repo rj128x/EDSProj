@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EDSApp"
+        xmlns:edsproj="clr-namespace:EDSProj;assembly=EDSProj"
         mc:Ignorable="d"
         Title="ReportWindow" Height="700" Width="1100">
     <Grid>
@@ -14,7 +15,7 @@
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="10"/>
+                <RowDefinition Height="20"/>
             </Grid.RowDefinitions>
             <Border BorderBrush="#FF1A23E2" BorderThickness="1,1,1,1" CornerRadius="4" Height="115"  VerticalAlignment="Top">
                 <StackPanel Grid.Row="0" Grid.Column="0">
@@ -28,6 +29,15 @@
                 </StackPanel>
             </Border>
             <local:SelectPointsControl x:Name="cntrlSelectPoints" Grid.Column="1" Grid.Row="0" />
+            <Grid Grid.Row="2" Grid.ColumnSpan="2" Name="grdStatus">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Подключение: "/>
+                    <TextBlock Text="{Binding ConnectInfo, Mode=OneWay}" Name="txtConnectInfo"/>
+                    <TextBlock Text="   Состояние: "/>
+                    <TextBlock Text="{Binding GlobalInfo, Mode=OneWay}" Name="txtGlobalInfo"/>
+                </StackPanel>
+            </Grid>
         </Grid>
+        
     </Grid>
 </Window>

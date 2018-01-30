@@ -1,25 +1,29 @@
 ﻿using EDSProj.EDSWebService;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace EDSProj
 {
 	public enum EDSReportPeriod { minute, hour, day, month }
-	public enum EDSReportFunction { avg,max,min,val,vyrab}
-	public class TechGroupInfo
-	{
+	public enum EDSReportFunction { avg, max, min, val, vyrab }
+	public class TechGroupInfo {
 		public string Name { get; set; }
 		public string Desc { get; set; }
 		public int Id { get; set; }
 		public bool Selected { get; set; }
 	}
 
+	public delegate void StateChangeDelegate();
 
-
-	public class EDSClass {
+	public class EDSClass : INotifyPropertyChanged
+	{
+		public event PropertyChangedEventHandler PropertyChanged;
 		public static EDSClass Single { get; protected set; }
 
 
@@ -29,6 +33,7 @@ namespace EDSProj
 		public static Dictionary<EDSReportPeriod, string> ReportPeriods { get; protected set; }
 		public static Dictionary<EDSReportFunction, string> ReportFunctions { get; protected set; }
 
+
 		protected static Dictionary<int, TechGroupInfo> _techGroups { get; set; }
 		public static Dictionary<int, TechGroupInfo> TechGroups {
 			get {
@@ -37,8 +42,32 @@ namespace EDSProj
 				return _techGroups;
 			}
 		}
-		
-		protected EDSClass() {
+
+		public void NotifyChanged(string propName) {
+			if (PropertyChanged != null)
+				PropertyChanged(this, new PropertyChangedEventArgs(propName));
+		}
+
+		protected  string _globalInfo;
+		public String GlobalInfo { get {
+				return _globalInfo;
+			}
+			protected set {
+				_globalInfo = value;
+				NotifyChanged("GlobalInfo");
+			}
+		}
+
+		protected string _connectInfo;
+		public  String ConnectInfo { get {
+				return _connectInfo;
+			} protected set {
+				_connectInfo = value;
+				NotifyChanged("ConnectInfo");
+			}
+		}
+
+		public  EDSClass() {
 			
 		}
 
@@ -55,6 +84,7 @@ namespace EDSProj
 
 		protected bool _connect() {
 			Logger.Info("Подключение к EDS серверу");
+			ConnectInfo = "Попытка подключения";
 			if (_client == null) {
 				_client = new edsPortTypeClient();								
 			}
@@ -63,6 +93,7 @@ namespace EDSProj
 				_authStr = _client.login(Settings.Single.EDSUser, Settings.Single.EDSPassword, ClientType.CLIENTTYPEDEFAULT);
 			}
 			Logger.Info("Состояние подключения: " + Client.State);
+			ConnectInfo = "Состояние подключения: " + Client.State;
 			return _client.State == System.ServiceModel.CommunicationState.Opened;
 		}
 
@@ -157,10 +188,29 @@ namespace EDSProj
 				Single._client.getRequestStatus(Single._authStr, id, out status, out progress, out msg);
 				Logger.Info(String.Format("{3} {0}: {1} ({2})", status, progress * 100, msg, i));
 				ok = status == RequestStatus.REQUESTSUCCESS;
+				Single.GlobalInfo=String.Format("Запрос {3} {0}: {1} ({2})", status, progress * 100, msg, i);
 				finished = ok || i >= 100;
-				System.Threading.Thread.Sleep(2000);
+				Thread.Sleep(1000);
 			} while (!finished);
-			//Console.ReadLine();
+
+			return ok;
+		}
+
+		public static async Task<bool> ProcessQueryAsync(uint id) {
+			bool finished = false;
+			int i = 0;
+			bool ok = false;
+			getRequestStatusRequest req = new getRequestStatusRequest(Single._authStr, id);
+			do {
+				i++;
+				getRequestStatusResponse res=await Single._client.getRequestStatusAsync(req);
+				Logger.Info(String.Format("{3} {0}: {1} ({2})", res.status, res.progress * 100, res.message, i));
+				ok = res.status == RequestStatus.REQUESTSUCCESS;
+				Single.GlobalInfo = String.Format("{3} {0}: {1:0.00} ({2})", res.status, res.progress * 100, res.message, i);
+				finished = ok || i >= 100;
+				
+				Thread.Sleep(1000);
+			} while (!finished);
 			return ok;
 		}
 

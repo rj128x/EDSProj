@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -26,13 +27,16 @@ namespace EDSApp
 			InitializeComponent();
 			cntrlSelectPoints.init();
 			cmbPeriod.ItemsSource = EDSClass.ReportPeriods;
-			
+
 			clndFrom.SelectedDate = DateTime.Now.Date.AddDays(-1);
 			clndTo.SelectedDate = DateTime.Now.Date;
 			cmbPeriod.SelectedValue = EDSReportPeriod.hour;
+			grdStatus.DataContext = EDSClass.Single;
 		}
 
-		private void btnCreate_Click(object sender, RoutedEventArgs e) {
+
+
+		private async void  btnCreate_Click(object sender, RoutedEventArgs e) {
 			if (!clndFrom.SelectedDate.HasValue) {
 				MessageBox.Show("Выберите дату начала");
 				return;
@@ -59,7 +63,7 @@ namespace EDSApp
 			DateTime dtStart = clndFrom.SelectedDate.Value;
 			DateTime dtEnd = clndTo.SelectedDate.Value;
 			//EDSReportFunction func = (EDSReportFunction)cmbFunction.SelectedValue;
-			
+
 			EDSReportPeriod period = (EDSReportPeriod)cmbPeriod.SelectedValue;
 
 			EDSReport report = new EDSReport(dtStart, dtEnd, period, chbMsk.IsChecked.Value);
@@ -68,7 +72,11 @@ namespace EDSApp
 				report.addRequestField(rec.Point, rec.Function);
 			}
 
-			report.ReadData();
+			//System.Windows.Application.Current.Dispatcher.Invoke( System.Windows.Threading.DispatcherPriority.Background, new System.Action(delegate { report.ReadData(); }));
+			
+
+			
+			bool ready=await report.ReadData();
 
 			String header = "";
 			foreach (EDSReportRequestRecord rec in report.RequestData.Values) {
@@ -97,7 +105,17 @@ namespace EDSApp
 			win.wbResult.NavigateToString(txt);
 			win.Show();
 
+			//thread.SetApartmentState(ApartmentState.STA);
+			//thread.Start();
+
+			//thread.Join();
+			//report.ReadData();
+
+
+
 		}
+
+
 	}
 }
 

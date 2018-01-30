@@ -28,8 +28,10 @@ namespace EDSApp
 		public List<TechGroupInfo> TechGroups;
 		public SelectPointsControl() {
 			InitializeComponent();
-			cmbFunction.ItemsSource = EDSClass.ReportFunctions;
-			cmbFunction.SelectedValue = EDSReportFunction.avg;
+			try {
+				cmbFunction.ItemsSource = EDSClass.ReportFunctions;
+				cmbFunction.SelectedValue = EDSReportFunction.avg;
+			} catch { }
 		}
 
 		public void init() {

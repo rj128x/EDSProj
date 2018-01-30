@@ -122,7 +122,7 @@ namespace EDSProj.ModesCentre
 
 					Logger.Info("Удаление номера ПБР");
 					uint id = EDSClass.Client.requestShadesClear(EDSClass.AuthStr, sel.ToArray());
-					ok = EDSClass.ProcessQuery(id);
+					ok =  EDSClass.ProcessQuery(id);
 
 					if (ok) {
 						List<Shade> shades = new List<Shade>();

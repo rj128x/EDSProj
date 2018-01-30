@@ -24,6 +24,8 @@ namespace EDSProj.EDS
 
 	}
 
+	public delegate void EDSFinish();
+
 	public class EDSReport
 	{
 		public DateTime DateStart { get; set; }
@@ -32,6 +34,7 @@ namespace EDSProj.EDS
 		public EDSReportPeriod Period { get; set; }
 		public Dictionary<string, EDSReportRequestRecord> RequestData = new Dictionary<string, EDSReportRequestRecord>();
 		public Dictionary<DateTime, Dictionary<string, double>> ResultData { get; set; }
+		public EDSFinish FinishRead;
 
 		public void addRequestField(EDSPointInfo point, EDSReportFunction func) {
 			try {
@@ -53,7 +56,7 @@ namespace EDSProj.EDS
 			}
 		}
 
-		public void ReadData() {
+		public async Task<bool> ReadData() {
 			ResultData = new Dictionary<DateTime, Dictionary<string, double>>();
 			DateTime date = DateStart.AddHours(0);
 			while (date < DateEnd) {
@@ -103,7 +106,7 @@ namespace EDSProj.EDS
 					req.items = list.ToArray();
 					uint id = EDSClass.Client.requestTabular(EDSClass.AuthStr, req);
 					TabularRow[] rows;
-					EDSClass.ProcessQuery(id);
+					bool ok= await EDSClass.ProcessQueryAsync(id);
 					PointId[] points = EDSClass.Client.getTabular(EDSClass.AuthStr, id, out rows);
 					List<string> keys = RequestData.Keys.ToList();
 
@@ -139,7 +142,7 @@ namespace EDSProj.EDS
 						req.items = list.ToArray();
 						uint id = EDSClass.Client.requestTabular(EDSClass.AuthStr, req);
 						TabularRow[] rows;
-						EDSClass.ProcessQuery(id);
+						bool ok= await EDSClass.ProcessQueryAsync(id);
 						PointId[] points = EDSClass.Client.getTabular(EDSClass.AuthStr, id, out rows);
 						List<string> keys = RequestData.Keys.ToList();
 
@@ -161,7 +164,7 @@ namespace EDSProj.EDS
 				}
 			}
 
-
+			return true;
 		}
 
 
