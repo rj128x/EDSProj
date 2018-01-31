@@ -39,9 +39,9 @@ namespace EDSProj
 
 	public class EDSPointsClass
 	{
-		protected static Dictionary<string,EDSPointInfo> _allAnalogPoints { get; set; }
+		protected static SortedList<string,EDSPointInfo> _allAnalogPoints { get; set; }
 
-		public static Dictionary<string, EDSPointInfo> AllAnalogPoints {
+		public static SortedList<string, EDSPointInfo> AllAnalogPoints {
 			get {
 				if (_allAnalogPoints == null)
 					GetAllPoints();
@@ -50,7 +50,7 @@ namespace EDSProj
 		}
 
 		protected static void GetAllPoints() {
-			_allAnalogPoints = new Dictionary<string, EDSPointInfo>();
+			_allAnalogPoints = new SortedList<string, EDSPointInfo>();
 			try {
 				string[] lines = System.IO.File.ReadAllLines("Data/allPoints.txt");
 				foreach (string line in lines) {

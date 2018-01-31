@@ -38,7 +38,8 @@ namespace EDSApp
 			SelectedPoints = new List<EDSReportRequestRecord>();
 			FilteredPoints = EDSPointsClass.AllAnalogPoints.Values.ToList();
 			TechGroups = EDSClass.TechGroups.Values.ToList();
-			lbPoints.ItemsSource = FilteredPoints;
+			//lbPoints.ItemsSource = FilteredPoints;
+			grdPoints.ItemsSource = FilteredPoints;
 			lbSelPoints.ItemsSource = SelectedPoints;
 			lbGroups.ItemsSource = TechGroups;
 			RefreshSelection("");
@@ -59,11 +60,12 @@ namespace EDSApp
 					}
 				}
 			}
-			lbPoints.Items.Refresh();
+			//lbPoints.Items.Refresh();
+			grdPoints.Items.Refresh();
 		}
 
 		private void lbPoints_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
-			try {
+			/*try {
 				EDSPointInfo selPoint = lbPoints.SelectedItem as EDSPointInfo;
 				EDSReportFunction func = (EDSReportFunction)cmbFunction.SelectedValue;
 				EDSReportRequestRecord rec = new EDSReportRequestRecord(selPoint,func);
@@ -73,7 +75,7 @@ namespace EDSApp
 					SelectedPoints.Add(rec);
 					lbSelPoints.Items.Refresh();
 				}
-			} catch { }
+			} catch { }*/
 
 		}
 
@@ -99,6 +101,20 @@ namespace EDSApp
 
 		private void CheckBox_Unchecked(object sender, RoutedEventArgs e) {
 			RefreshSelection(txtFilter.Text);
+		}
+
+		private void grdPoints_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
+			try {
+				EDSPointInfo selPoint = grdPoints.SelectedItem as EDSPointInfo;
+				EDSReportFunction func = (EDSReportFunction)cmbFunction.SelectedValue;
+				EDSReportRequestRecord rec = new EDSReportRequestRecord(selPoint, func);
+
+				bool exists = SelectedPoints.Exists(req => req.Id == rec.Id);
+				if (!exists) {
+					SelectedPoints.Add(rec);
+					lbSelPoints.Items.Refresh();
+				}
+			} catch { }
 		}
 	}
 }

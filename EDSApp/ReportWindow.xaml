@@ -17,7 +17,7 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="20"/>
             </Grid.RowDefinitions>
-            <Border BorderBrush="#FF1A23E2" BorderThickness="1,1,1,1" CornerRadius="4" Height="135"  VerticalAlignment="Top">
+            <Border Height="135"  VerticalAlignment="Top">
                 <StackPanel Grid.Row="0" Grid.Column="0">
                     <DatePicker Name="clndFrom"/>
                     <DatePicker Name="clndTo"/>
@@ -38,15 +38,15 @@
                 </Grid.ColumnDefinitions>
                 <StackPanel Orientation="Horizontal" Grid.Column="0">
                     <TextBlock Text="Подключение: "/>
-                    <TextBlock Text="{Binding ConnectInfo, Mode=OneWay}" Name="txtConnectInfo"/>                    
+                    <TextBlock Text="{Binding ConnectInfo, Mode=OneWay}" Name="txtConnectInfo" Style="{StaticResource ValueText}"/>                    
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Grid.Column="1">
                     <TextBlock Text="Запрос: "/>
-                    <TextBlock Text="{Binding ProcessInfo, Mode=OneWay}" Name="txtProcessInfo"/>
+                    <TextBlock Text="{Binding ProcessInfo, Mode=OneWay}" Name="txtProcessInfo" Style="{StaticResource ValueText}"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Grid.Column="2">                    
                     <TextBlock Text="Состояние: "/>
-                    <TextBlock Text="{Binding GlobalInfo, Mode=OneWay}" Name="txtGlobalInfo"/>
+                    <TextBlock Text="{Binding GlobalInfo, Mode=OneWay}" Name="txtGlobalInfo" Style="{StaticResource ValueText}"/>
                 </StackPanel>
             </Grid>
         </Grid>

@@ -29,12 +29,12 @@ namespace EDSApp
 
 		private void button_Click(object sender, RoutedEventArgs e) {
 			ReportWindow win = new EDSApp.ReportWindow();
-			win.Show();
+			win.ShowDialog();
 		}
 
 		private void buttonWater_Click(object sender, RoutedEventArgs e) {
 			WaterWindow win = new WaterWindow();
-			win.Show();
+			win.ShowDialog();
 		}
 	}
 }
