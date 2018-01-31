@@ -3,6 +3,8 @@ using EDSProj.EDS;
 using EDSProj.EDSWebService;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -37,6 +39,10 @@ namespace EDSApp
 
 
 		private async void  btnCreate_Click(object sender, RoutedEventArgs e) {
+			if (!EDSClass.Single.Ready) {
+				MessageBox.Show("ЕДС сервер не готов");
+				return;
+			}
 			if (!clndFrom.SelectedDate.HasValue) {
 				MessageBox.Show("Выберите дату начала");
 				return;
@@ -83,11 +89,14 @@ namespace EDSApp
 				header += String.Format("<th>{0}</th>", rec.Desc);
 			}
 
+			TextWriter tW = new StreamWriter("c:/out.html");
+
 			String txt = string.Format(@"<html>
 				<head>
 					<meta http-equiv=""Content-Type"" content=""text/html; charset=UTF-8"" />
             </head>
 				<table border='1'><tr><th>точка</th>{0}</tr>", header);
+			tW.WriteLine(txt);
 
 			foreach (KeyValuePair<DateTime, Dictionary<string, double>> de in report.ResultData) {
 				DateTime dt = de.Key;
@@ -95,15 +104,22 @@ namespace EDSApp
 				foreach (double val in de.Value.Values) {
 					ValuesStr += String.Format("<td align='right'>{0:0.00}</td>", val);
 				}
-				txt += String.Format("<tr><th>{0}</th>{1}</tr>", dt.ToString("dd.MM.yyyy HH:mm"), ValuesStr);
+				tW.WriteLine(String.Format("<tr><th>{0}</th>{1}</tr>", dt.ToString("dd.MM.yyyy HH:mm"), ValuesStr));
+				//txt += String.Format("<tr><th>{0}</th>{1}</tr>", dt.ToString("dd.MM.yyyy HH:mm"), ValuesStr);
 			}
-			txt += "</table></html>";
+			//txt += "</table></html>";
+			tW.WriteLine("</table></html>");
+			tW.Close();
 
 
 
-			ReportResultWindow win = new ReportResultWindow();
-			win.wbResult.NavigateToString(txt);
-			win.Show();
+			//ReportResultWindow win = new ReportResultWindow();
+			//win.wbResult.NavigateToString(txt);
+			/*Uri uri = new Uri(@"c:/out.html", UriKind.Relative);
+			Stream stream = Application.GetContentStream(uri).Stream;
+			win.wbResult.NavigateToStream(stream);
+			win.Show();*/
+			Process.Start("c:/out.html");
 
 			//thread.SetApartmentState(ApartmentState.STA);
 			//thread.Start();
@@ -115,7 +131,10 @@ namespace EDSApp
 
 		}
 
-
+		private void btnAbort_Click(object sender, RoutedEventArgs e) {
+			//MessageBox.Show("прерывание");
+			EDSClass.Single.Abort();
+		}
 	}
 }
 

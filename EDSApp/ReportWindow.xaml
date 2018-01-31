@@ -17,7 +17,7 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="20"/>
             </Grid.RowDefinitions>
-            <Border BorderBrush="#FF1A23E2" BorderThickness="1,1,1,1" CornerRadius="4" Height="115"  VerticalAlignment="Top">
+            <Border BorderBrush="#FF1A23E2" BorderThickness="1,1,1,1" CornerRadius="4" Height="135"  VerticalAlignment="Top">
                 <StackPanel Grid.Row="0" Grid.Column="0">
                     <DatePicker Name="clndFrom"/>
                     <DatePicker Name="clndTo"/>
@@ -26,6 +26,7 @@
                     <ComboBox Name="cmbPeriod" DisplayMemberPath="Value" SelectedValuePath="Key"/>
 
                     <Button Content="Сформировать" Name="btnCreate" Click="btnCreate_Click"/>
+                    <Button Content="Прервать" Name="btnAbort" Click="btnAbort_Click"/>
                 </StackPanel>
             </Border>
             <local:SelectPointsControl x:Name="cntrlSelectPoints" Grid.Column="1" Grid.Row="0" />

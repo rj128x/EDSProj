@@ -105,17 +105,20 @@ namespace EDSProj.EDS
 					DateTime ds = DateStart.AddHours(0);
 					DateTime de = DateStart.AddHours(1);
 					while (ds < DateEnd) {
-						/*int i0 = dates.IndexOf(ds);
-						int i1 = i0 + 100;
-						de = i1 < dates.Count ? dates[i1] : DateEnd;*/
-						de = de.AddDays(5);
-						try {
-							de = dates.First(d => d >= de);
-						} catch {
-							de = DateEnd;
+						if (Period == EDSReportPeriod.minute || Period == EDSReportPeriod.sec) {
+							int i0 = dates.IndexOf(ds);
+							int i1 = i0 + 1000;
+							de = i1 < dates.Count ? dates[i1] : DateEnd;
+						} else {
+							de = de.AddDays(5);
+							try {
+								de = dates.First(d => d >= de);
+							} catch {
+								de = DateEnd;
+							}
 						}
-						
-						EDSClass.Single.GlobalInfo = String.Format("{0}-{1}", ds.ToShortDateString(), de.ToShortDateString());
+
+						EDSClass.Single.GlobalInfo = String.Format("{0}-{1}", ds.ToString("dd.MM.yyyy HH:mm:ss"), de.ToString("dd.MM.yyyy HH:mm:ss"));
 
 						TabularRequest req = new TabularRequest();
 						req.period = new TimePeriod() {
@@ -128,6 +131,8 @@ namespace EDSProj.EDS
 						uint id = EDSClass.Client.requestTabular(EDSClass.AuthStr, req);
 						TabularRow[] rows;
 						bool ok = await EDSClass.ProcessQueryAsync(id);
+						if (!ok)
+							break;
 						PointId[] points = EDSClass.Client.getTabular(EDSClass.AuthStr, id, out rows);
 						List<string> keys = RequestData.Keys.ToList();
 
@@ -144,10 +149,9 @@ namespace EDSProj.EDS
 								ResultData[dt][resId] = val;
 							}
 						}
+
 						ds = de.AddHours(0);
 					}
-
-
 				} else {
 					DateTime ds = DateStart.AddHours(0);
 					while (ds < DateEnd) {
@@ -165,6 +169,8 @@ namespace EDSProj.EDS
 						uint id = EDSClass.Client.requestTabular(EDSClass.AuthStr, req);
 						TabularRow[] rows;
 						bool ok = await EDSClass.ProcessQueryAsync(id);
+						if (!ok)
+							break;
 						PointId[] points = EDSClass.Client.getTabular(EDSClass.AuthStr, id, out rows);
 						List<string> keys = RequestData.Keys.ToList();
 

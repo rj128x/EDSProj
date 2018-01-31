@@ -78,6 +78,48 @@ namespace EDSProj
 			}
 		}
 
+		protected bool _ready;
+		public bool Ready {
+			get {
+				return _ready;
+			}
+			set {
+				_ready = value;
+				if (_ready)
+					AbortCalc = false;
+				NotifyChanged("Ready");
+			}
+		}
+
+		protected bool _processCalc;
+		public bool ProcessCalc {
+			get {
+				return _processCalc;
+			}
+			set {
+				_processCalc = value;
+				if (!_processCalc)
+					AbortCalc = false;
+				NotifyChanged("ProcessCalc");
+			}
+		}
+
+		protected bool _abortCalc;
+		public bool AbortCalc {
+			get {
+				return _abortCalc;
+			}
+			set {
+				_abortCalc = value;				
+				NotifyChanged("AbortCalc");
+			}
+		}
+
+		public void Abort() {
+			if (!AbortCalc && ProcessCalc)
+				AbortCalc = true;
+		}
+
 		public  EDSClass() {
 			
 		}
@@ -105,15 +147,21 @@ namespace EDSProj
 			}
 			Logger.Info("Состояние подключения: " + Client.State);
 			ConnectInfo = "Состояние подключения: " + Client.State;
-			return _client.State == System.ServiceModel.CommunicationState.Opened;
+			bool connected = _client.State == System.ServiceModel.CommunicationState.Opened;
+			Single.Ready = connected;
+			return connected;
 		}
 
 		public static bool Connected {
 			get {
-				if (Single._client == null)
-					return false;
+				bool con = false;
+				if (Single._client == null)										
+					con=false;
 				else
-					return Single._client.State == System.ServiceModel.CommunicationState.Opened;
+					con=Single._client.State == System.ServiceModel.CommunicationState.Opened;
+				if (!con)
+					Single.Ready = false;
+				return con;
 			}
 		}
 
@@ -192,41 +240,67 @@ namespace EDSProj
 		}
 
 		public  static bool ProcessQuery(uint id) {
+			Single.ProcessCalc = true;
+			Single.Ready = false;
 			bool finished = false;
 			RequestStatus status;
 			float progress;
 			string msg;
 			int i = 0;
 			bool ok = false;
-			do {
-				i++;
-				Single._client.getRequestStatus(Single._authStr, id, out status, out progress, out msg);
-				Logger.Info(String.Format("{3} {0}: {1} ({2})", status, progress * 100, msg, i));
-				ok = status == RequestStatus.REQUESTSUCCESS;
-				Single.ProcessInfo=String.Format("Запрос {0}: {1}% ({2})", msg, progress * 100, i);
-				finished = ok || i >= 100;
-				Thread.Sleep(1000);
-			} while (!finished);
+			try {
+				do {
+					Thread.Sleep(200);
+					i++;
+					Single._client.getRequestStatus(Single._authStr, id, out status, out progress, out msg);
+					Logger.Info(String.Format("{3} {0}: {1} ({2})", status, progress * 100, msg, i));
+					ok = status == RequestStatus.REQUESTSUCCESS;
+					Single.ProcessInfo = String.Format("Запрос {0}: {1}% ({2})", msg, progress * 100, i);
+					finished = ok || i >= 1000;
+					if (Single.AbortCalc) {
+						Single.AbortCalc = false;
+						finished=true;
+						ok = false;
+					}
+				} while (!finished);
+			}catch (Exception e) {
+				Logger.Info(e.ToString());
+			}
+
+			Single.ProcessCalc = false;
+			Single.Ready = true;
 
 			return ok;
 		}
 
 		public static async Task<bool> ProcessQueryAsync(uint id) {
+			Single.ProcessCalc = true;
+			Single.Ready = false;
 			bool finished = false;
 			int i = 0;
 			bool ok = false;
 			getRequestStatusRequest req = new getRequestStatusRequest(Single._authStr, id);
-			do {
-				Thread.Sleep(500);
-				i++;
-				getRequestStatusResponse res=await Single._client.getRequestStatusAsync(req);
-				Logger.Info(String.Format("{3} {0}: {1} ({2})", res.status, res.progress * 100, res.message, i));
-				ok = res.status == RequestStatus.REQUESTSUCCESS;
-				Single.ProcessInfo = String.Format("Запрос {0}: {1}% ({2})", res.message, res.progress * 100, i);
-				finished = ok || i >= 500;
-				
-				
-			} while (!finished);
+			try {
+				do {
+					Thread.Sleep(500);
+					i++;
+					getRequestStatusResponse res = await Single._client.getRequestStatusAsync(req);
+					Logger.Info(String.Format("{3} {0}: {1} ({2})", res.status, res.progress * 100, res.message, i));
+					ok = res.status == RequestStatus.REQUESTSUCCESS;
+					Single.ProcessInfo = String.Format("Запрос {0}: {1}% ({2})", res.message, res.progress * 100, i);
+					finished = ok || i >= 500;
+					if (Single.AbortCalc) {
+						Single.AbortCalc = false;
+						finished = true;
+						ok = false;
+					}
+
+				} while (!finished);
+			}catch (Exception e) {
+				Logger.Info(e.ToString());
+			}
+			Single.ProcessCalc = false;
+			Single.Ready = true;
 			return ok;
 		}
 
