@@ -89,7 +89,7 @@ namespace EDSApp
 				header += String.Format("<th>{0}</th>", rec.Desc);
 			}
 
-			TextWriter tW = new StreamWriter("c:/out.html");
+			TextWriter tW = new StreamWriter("out.html");
 
 			String txt = string.Format(@"<html>
 				<head>
@@ -119,7 +119,7 @@ namespace EDSApp
 			Stream stream = Application.GetContentStream(uri).Stream;
 			win.wbResult.NavigateToStream(stream);
 			win.Show();*/
-			Process.Start("c:/out.html");
+			Process.Start("out.html");
 
 			//thread.SetApartmentState(ApartmentState.STA);
 			//thread.Start();

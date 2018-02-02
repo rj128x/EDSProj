@@ -87,5 +87,49 @@ namespace EDSApp
 			txt += "</table>";
 			wbResult.NavigateToString(txt);
 		}
+
+		private void btn8H_Click(object sender, RoutedEventArgs e) {
+			double napor = getDouble(txtHGES_8H.Text);
+			double pRaspGTP1 = getDouble(txtPGTP1_8H.Text);
+			double pRaspGTP2 = getDouble(txtPGTP2_8H.Text);
+			double qFAVR = getDouble(txtQ_FAVR_8H.Text);
+			double needTime = getDouble(txt_TIME_8H.Text);
+			double needQ0 = getDouble(txtQ0_8H.Text);
+
+			double rashod8 = (qFAVR * 24 - needQ0 * (24 - needTime)) / needTime;
+			double p8h_GES = InerpolationRashod.getPowerGES(rashod8, napor);
+			double p8h_GTP1 = p8h_GES / (pRaspGTP1+pRaspGTP2) * pRaspGTP1;
+			if (p8h_GES - p8h_GTP1 > pRaspGTP2)
+				p8h_GTP1 = pRaspGTP1;
+			double p8h_GTP2 = p8h_GES - p8h_GTP1;
+
+			double pikGTP1 = pRaspGTP1 - p8h_GTP1;
+			double pikGTP2 = pRaspGTP2 - p8h_GTP2;
+			double pikGES = pRaspGTP1 + pRaspGTP2 - p8h_GES;
+
+			double q_gtp1 = OptimRashod.getOptimRashod(p8h_GTP1, napor);
+			double q_gtp2 = OptimRashod.getOptimRashod(p8h_GTP2, napor);
+			double q_ges = q_gtp1+q_gtp2;
+
+			txt_pRasp_GTP1.Text = pRaspGTP1.ToString("0.00");
+			txt_pRasp_GTP2.Text = pRaspGTP2.ToString("0.00");
+			txt_pRasp_GES.Text = (pRaspGTP1+pRaspGTP2).ToString("0.00");
+
+			txt_p8h_GTP1.Text = p8h_GTP1.ToString("0.00");
+			txt_p8h_GTP2.Text = p8h_GTP2.ToString("0.00");
+			txt_p8h_GES.Text = p8h_GES.ToString("0.00");
+
+			txt_pPik_GTP1.Text = pikGTP1.ToString("0.00");
+			txt_pPik_GTP2.Text = pikGTP2.ToString("0.00");
+			txt_pPik_GES.Text = pikGES.ToString("0.00");
+
+			txt_q_GTP1.Text = q_gtp1.ToString("0.00");
+			txt_q_GTP2.Text = q_gtp2.ToString("0.00");
+			txt_q_GES.Text = q_ges.ToString("0.00");
+
+			txt_q8h_GES_check.Text = rashod8.ToString("0.00");
+			//txt_p8h_GES_check.Text = p8h_GES.ToString("0.00");
+
+		}
 	}
 }
