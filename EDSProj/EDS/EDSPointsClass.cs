@@ -125,8 +125,6 @@ namespace EDSProj
 				Logger.Info(("Ошибка при получении списка точек: " + e.ToString()));
 
 			} finally {
-				EDSClass.Single.GlobalInfo = "Ожидание";
-				EDSClass.Single.ProcessInfo = "Ожидание";
 				EDSClass.Single.Ready = true;
 				EDSClass.Single.ProcessCalc = false;
 			}

@@ -91,8 +91,10 @@ namespace EDSProj
 			}
 			set {
 				_ready = value;
-				if (_ready)
+				if (_ready) {
 					AbortCalc = false;
+					GlobalInfo = "...";					
+				}
 				NotifyChanged("Ready");
 			}
 		}
@@ -104,8 +106,10 @@ namespace EDSProj
 			}
 			set {
 				_processCalc = value;
-				if (!_processCalc)
+				if (!_processCalc) {
 					AbortCalc = false;
+					ProcessInfo = "...";
+				}
 				NotifyChanged("ProcessCalc");
 			}
 		}
@@ -122,8 +126,11 @@ namespace EDSProj
 		}
 
 		public void Abort() {
-			if (!AbortCalc && ProcessCalc)
+			if (!AbortCalc && ProcessCalc) {
 				AbortCalc = true;
+				GlobalInfo = "Прерывание";
+				ProcessInfo = "Прерывание";
+			}
 		}
 
 		public EDSClass() {
@@ -333,7 +340,6 @@ namespace EDSProj
 					}
 				}
 			} finally {
-				Single.GlobalInfo = "Ожидание";
 				Single.ProcessCalc = false;
 				Single.Ready = true;
 			}

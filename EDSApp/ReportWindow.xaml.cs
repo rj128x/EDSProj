@@ -104,10 +104,8 @@ namespace EDSApp
 				foreach (double val in de.Value.Values) {
 					ValuesStr += String.Format("<td align='right'>{0:0.00}</td>", val);
 				}
-				tW.WriteLine(String.Format("<tr><th>{0}</th>{1}</tr>", dt.ToString("dd.MM.yyyy HH:mm"), ValuesStr));
-				//txt += String.Format("<tr><th>{0}</th>{1}</tr>", dt.ToString("dd.MM.yyyy HH:mm"), ValuesStr);
-			}
-			//txt += "</table></html>";
+				tW.WriteLine(String.Format("<tr><th>{0}</th>{1}</tr>", dt.ToString("dd.MM.yyyy HH:mm:ss"), ValuesStr));				
+			}			
 			tW.WriteLine("</table></html>");
 			tW.Close();
 

@@ -42,11 +42,11 @@
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Grid.Column="1">
                     <TextBlock Text="Запрос: "/>
-                    <TextBlock Text="{Binding ProcessInfo, Mode=OneWay}" Name="txtProcessInfo" Style="{StaticResource ValueText}"/>
+                    <TextBlock Text="{Binding GlobalInfo, Mode=OneWay}" Name="txtGlobalInfo" Style="{StaticResource ValueText}"/>                    
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Grid.Column="2">                    
                     <TextBlock Text="Состояние: "/>
-                    <TextBlock Text="{Binding GlobalInfo, Mode=OneWay}" Name="txtGlobalInfo" Style="{StaticResource ValueText}"/>
+                    <TextBlock Text="{Binding ProcessInfo, Mode=OneWay}" Name="txtProcessInfo" Style="{StaticResource ValueText}"/>
                 </StackPanel>
             </Grid>
         </Grid>
