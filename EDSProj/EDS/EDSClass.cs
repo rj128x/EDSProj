@@ -10,9 +10,10 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace EDSProj
 {
-	public enum EDSReportPeriod {sec, minute, hour, day, month }
+	public enum EDSReportPeriod { sec, minute, hour, day, month }
 	public enum EDSReportFunction { avg, max, min, val, vyrab }
-	public class TechGroupInfo {
+	public class TechGroupInfo
+	{
 		public string Name { get; set; }
 		public string Desc { get; set; }
 		public int Id { get; set; }
@@ -29,39 +30,44 @@ namespace EDSProj
 
 		protected string _authStr { get; set; }
 		protected edsPortTypeClient _client { get; set; }
-		
+
 		public static Dictionary<EDSReportPeriod, string> ReportPeriods { get; protected set; }
 		public static Dictionary<EDSReportFunction, string> ReportFunctions { get; protected set; }
 
 
 		protected static Dictionary<int, TechGroupInfo> _techGroups { get; set; }
-		public static Dictionary<int, TechGroupInfo> TechGroups {
-			get {
-				if (_techGroups == null)
-					_techGroups = Single.getTechGroups();
-				return _techGroups;
+		public async static Task<Dictionary<int, TechGroupInfo>> GetTechGroups() {
+
+			if (_techGroups == null) {
+				bool ok = await loadTechGroupsFromServer();
 			}
+			return _techGroups;
+
 		}
+
 
 		public void NotifyChanged(string propName) {
 			if (PropertyChanged != null)
 				PropertyChanged(this, new PropertyChangedEventArgs(propName));
 		}
 
-		protected  string _globalInfo;
-		public String GlobalInfo { get {
+		protected string _globalInfo;
+		public String GlobalInfo {
+			get {
 				return _globalInfo;
 			}
-			 set {
+			set {
 				_globalInfo = value;
 				NotifyChanged("GlobalInfo");
 			}
 		}
 
 		protected string _connectInfo;
-		public  String ConnectInfo { get {
+		public String ConnectInfo {
+			get {
 				return _connectInfo;
-			}  set {
+			}
+			set {
 				_connectInfo = value;
 				NotifyChanged("ConnectInfo");
 			}
@@ -110,7 +116,7 @@ namespace EDSProj
 				return _abortCalc;
 			}
 			set {
-				_abortCalc = value;				
+				_abortCalc = value;
 				NotifyChanged("AbortCalc");
 			}
 		}
@@ -120,8 +126,8 @@ namespace EDSProj
 				AbortCalc = true;
 		}
 
-		public  EDSClass() {
-			
+		public EDSClass() {
+
 		}
 
 		public static long toTS(DateTime date) {
@@ -132,14 +138,14 @@ namespace EDSProj
 
 		public static DateTime fromTS(long sec) {
 			DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-			return origin.AddSeconds(sec).ToLocalTime() ;
+			return origin.AddSeconds(sec).ToLocalTime();
 		}
 
 		protected bool _connect() {
 			Logger.Info("Подключение к EDS серверу");
 			ConnectInfo = "Попытка подключения";
 			if (_client == null) {
-				_client = new edsPortTypeClient();								
+				_client = new edsPortTypeClient();
 			}
 			Logger.Info("Проверка состояния подключения");
 			if (_client.State != System.ServiceModel.CommunicationState.Opened) {
@@ -155,10 +161,10 @@ namespace EDSProj
 		public static bool Connected {
 			get {
 				bool con = false;
-				if (Single._client == null)										
-					con=false;
+				if (Single._client == null)
+					con = false;
 				else
-					con=Single._client.State == System.ServiceModel.CommunicationState.Opened;
+					con = Single._client.State == System.ServiceModel.CommunicationState.Opened;
 				if (!con)
 					Single.Ready = false;
 				return con;
@@ -227,19 +233,19 @@ namespace EDSProj
 					res = 1;
 					break;
 				case EDSReportPeriod.minute:
-					res=60;
+					res = 60;
 					break;
 				case EDSReportPeriod.hour:
-					res= 3600;
+					res = 3600;
 					break;
 				case EDSReportPeriod.day:
-					res= 3600 * 24;
+					res = 3600 * 24;
 					break;
 			}
 			return res;
 		}
 
-		public  static bool ProcessQuery(uint id) {
+		public static bool ProcessQuery(uint id) {
 			Single.ProcessCalc = true;
 			Single.Ready = false;
 			bool finished = false;
@@ -259,11 +265,11 @@ namespace EDSProj
 					finished = ok || i >= 1000;
 					if (Single.AbortCalc) {
 						Single.AbortCalc = false;
-						finished=true;
+						finished = true;
 						ok = false;
 					}
 				} while (!finished);
-			}catch (Exception e) {
+			} catch (Exception e) {
 				Logger.Info(e.ToString());
 			}
 
@@ -296,7 +302,7 @@ namespace EDSProj
 					}
 
 				} while (!finished);
-			}catch (Exception e) {
+			} catch (Exception e) {
 				Logger.Info(e.ToString());
 			}
 			Single.ProcessCalc = false;
@@ -304,21 +310,35 @@ namespace EDSProj
 			return ok;
 		}
 
-		protected Dictionary<int, TechGroupInfo> getTechGroups() {
+		protected async static Task<bool> loadTechGroupsFromServer() {
 			if (!Connected)
 				Connect();
-			Group[] groups=Client.getTechnologicalGroups(AuthStr);
-			Dictionary<int, TechGroupInfo> Result = new Dictionary<int, TechGroupInfo>();
-			foreach (Group gr in groups) {
-				if (!String.IsNullOrEmpty(gr.desc)) {
-					TechGroupInfo tg = new TechGroupInfo();
-					tg.Id = gr.id;
-					tg.Name = gr.name;
-					tg.Desc = gr.desc;
-					Result.Add(gr.id, tg);
+
+			Single.GlobalInfo = "Получение групп точек";
+			Single.ProcessCalc = true;
+			Single.Ready = false;
+			_techGroups = new Dictionary<int, TechGroupInfo>();
+			try {
+				getTechnologicalGroupsRequest req = new getTechnologicalGroupsRequest();
+				req.authString = EDSClass.AuthStr;
+				getTechnologicalGroupsResponse resp = await Client.getTechnologicalGroupsAsync(EDSClass.AuthStr);
+
+				foreach (Group gr in resp.groups) {
+					if (!String.IsNullOrEmpty(gr.desc)) {
+						TechGroupInfo tg = new TechGroupInfo();
+						tg.Id = gr.id;
+						tg.Name = gr.name;
+						tg.Desc = gr.desc;
+						_techGroups.Add(gr.id, tg);
+					}
 				}
+			} finally {
+				Single.GlobalInfo = "Ожидание";
+				Single.ProcessCalc = false;
+				Single.Ready = true;
 			}
-			return Result;
+			return true;
+			//_techGroups = Result;
 		}
 
 

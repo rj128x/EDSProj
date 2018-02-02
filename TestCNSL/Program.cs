@@ -31,6 +31,17 @@ namespace TestCNSL
 				iessRe = "30VT_CE1011AM-180.UNIT0@SCADA"
 			};
 
+			getTechnologicalGroupsResponse rsp = await EDSClass.Client.getTechnologicalGroupsAsync(EDSClass.AuthStr);
+
+			foreach (Group gr in rsp.groups) {
+				if (!String.IsNullOrEmpty(gr.desc)) {
+					Console.WriteLine(gr.ToString());
+				}
+			}
+
+
+			return;
+
 			getPointsRequest req = new getPointsRequest();
 			req.authString = EDSClass.AuthStr;
 			req.filter = pf;

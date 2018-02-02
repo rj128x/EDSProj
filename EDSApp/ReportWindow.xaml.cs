@@ -26,8 +26,7 @@ namespace EDSApp
 	public partial class ReportWindow : Window
 	{
 		public ReportWindow() {
-			InitializeComponent();
-			cntrlSelectPoints.init();
+			InitializeComponent();			
 			cmbPeriod.ItemsSource = EDSClass.ReportPeriods;
 
 			clndFrom.SelectedDate = DateTime.Now.Date.AddDays(-1);
@@ -35,6 +34,7 @@ namespace EDSApp
 			cmbPeriod.SelectedValue = EDSReportPeriod.hour;
 			grdStatus.DataContext = EDSClass.Single;
 		}
+
 
 
 
@@ -134,6 +134,10 @@ namespace EDSApp
 		private void btnAbort_Click(object sender, RoutedEventArgs e) {
 			//MessageBox.Show("прерывание");
 			EDSClass.Single.Abort();
+		}
+
+		private async void Window_Loaded(object sender, RoutedEventArgs e) {
+			bool ok=await cntrlSelectPoints.init();
 		}
 	}
 }

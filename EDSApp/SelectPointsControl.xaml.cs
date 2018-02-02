@@ -26,6 +26,7 @@ namespace EDSApp
 		public List<EDSReportRequestRecord> SelectedPoints;
 		public List<EDSPointInfo> FilteredPoints;
 		public List<TechGroupInfo> TechGroups;
+		public SortedList<string, EDSPointInfo> AllPoints;
 		public SelectPointsControl() {
 			InitializeComponent();
 			try {
@@ -34,21 +35,25 @@ namespace EDSApp
 			} catch { }
 		}
 
-		public void init() {
+		public async Task<bool> init() {
 			SelectedPoints = new List<EDSReportRequestRecord>();
-			FilteredPoints = EDSPointsClass.AllAnalogPoints.Values.ToList();
-			TechGroups = EDSClass.TechGroups.Values.ToList();
+			Dictionary<int, TechGroupInfo> grs = await EDSClass.GetTechGroups();
+			TechGroups = grs.Values.ToList();
+			AllPoints = await EDSPointsClass.GetAllAnalogPoints();
+			FilteredPoints = AllPoints.Values.ToList();
+			
 			//lbPoints.ItemsSource = FilteredPoints;
 			grdPoints.ItemsSource = FilteredPoints;
 			lbSelPoints.ItemsSource = SelectedPoints;
 			lbGroups.ItemsSource = TechGroups;
 			RefreshSelection("");
+			return true;
 		}
 
 		public void RefreshSelection(string text) {
 			FilteredPoints.Clear();
 			Regex regex = new Regex(text);
-			foreach (EDSPointInfo point in EDSPointsClass.AllAnalogPoints.Values) {
+			foreach (EDSPointInfo point in AllPoints.Values) {
 				foreach (TechGroupInfo tg in TechGroups) {
 					if (FilteredPoints.Contains(point))
 						continue;

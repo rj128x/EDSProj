@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:EDSApp"
         xmlns:edsproj="clr-namespace:EDSProj;assembly=EDSProj"
         mc:Ignorable="d"
-        Title="ReportWindow" Height="700" Width="1100">
+        Title="ReportWindow" Height="700" Width="1100" Loaded="Window_Loaded" >
     <Grid>
         <Grid Margin="0,20,0,0">
             <Grid.ColumnDefinitions>
