@@ -109,28 +109,12 @@ namespace EDSApp
 			tW.WriteLine("</table></html>");
 			tW.Close();
 
-
-
-			//ReportResultWindow win = new ReportResultWindow();
-			//win.wbResult.NavigateToString(txt);
-			/*Uri uri = new Uri(@"c:/out.html", UriKind.Relative);
-			Stream stream = Application.GetContentStream(uri).Stream;
-			win.wbResult.NavigateToStream(stream);
-			win.Show();*/
 			Process.Start("out.html");
-
-			//thread.SetApartmentState(ApartmentState.STA);
-			//thread.Start();
-
-			//thread.Join();
-			//report.ReadData();
-
 
 
 		}
 
 		private void btnAbort_Click(object sender, RoutedEventArgs e) {
-			//MessageBox.Show("прерывание");
 			EDSClass.Single.Abort();
 		}
 
