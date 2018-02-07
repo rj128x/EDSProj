@@ -18,67 +18,64 @@ namespace TestCNSL
 			Console.ReadLine();
 		}
 
-		public static async void run() {
+		public async static  void run() {
 			uint cnt;
 			uint total;
 			if (!EDSClass.Connected)
 				EDSClass.Connect();
-			List<PointType> types = new List<PointType>();
-			types.Add(PointType.POINTTYPEANALOG);
-			types.Add(PointType.POINTTYPEDOUBLE);
 
-			PointFilter pf = new PointFilter() {
-				iessRe = "30VT_CE1011AM-180.UNIT0@SCADA"
+			TabularRequest req = new TabularRequest();
+			List<TabularRequestItem> items = new List<TabularRequestItem>();
+			items.Add(new TabularRequestItem() {
+				function = "UNDER_TIME",
+				pointId = new PointId() {
+					iess = "04VT_DS02DI-01.MCR@GRARM"
+				},
+				@params=new double[] {0.9},
+				shadePriority=ShadePriority.REGULARONLY
+				
+			});
+			req.items = items.ToArray();			
+
+			req.period = new TimePeriod() {
+				from = new Timestamp() {
+					second = EDSClass.toTS(DateTime.Parse("01.01.2018"))
+				},
+				till = new Timestamp() {
+					second = EDSClass.toTS(DateTime.Parse("05.02.2018"))
+				}
 			};
 
-			getTechnologicalGroupsResponse rsp = await EDSClass.Client.getTechnologicalGroupsAsync(EDSClass.AuthStr);
+			req.step = new TimeDuration() {
+				seconds = 30 * 60
+			};
 
-			foreach (Group gr in rsp.groups) {
-				if (!String.IsNullOrEmpty(gr.desc)) {
-					Console.WriteLine(gr.ToString());
+			uint id=EDSClass.Client.requestTabular(EDSClass.AuthStr, req);
+
+			EDSClass.ProcessQuery(id);
+
+			TabularRow[] rows;
+
+			getTabularRequest request = new getTabularRequest() {
+				authString = EDSClass.AuthStr,
+				requestId=id
+			};
+
+			getTabularResponse resp= await EDSClass.Client.getTabularAsync(request);
+
+			foreach (TabularRow row in resp.rows) {
+				DateTime date = EDSClass.fromTS(row.ts.second);
+				List<double> vals = new List<double>();
+				foreach (TabularValue val in row.values) {
+					vals.Add(EDSClass.getVal(val.value));
+
 				}
-			}
-
-
-			return;
-
-			getPointsRequest req = new getPointsRequest();
-			req.authString = EDSClass.AuthStr;
-			req.filter = pf;
-			req.maxCount = 20000;
-			req.order = "";			
-			bool finish = false;
-			uint index = 0;
-			
-			while (!finish) {
-				req.startIdx = index ;
-				getPointsResponse resp = await EDSClass.Client.getPointsAsync(req);
-				//Point[] points = EDSClass.Client.getPoints(EDSClass.AuthStr, filter, "", index, 1000, out cnt, out total);
-				foreach (Point point in resp.points) {
-					try {
-						/*string tg = string.Join(";", point.tg);
-						_allAnalogPoints.Add(point.id.iess, new EDSPointInfo(point.id.iess, point.desc, tg, point.ar.ToString()));*/
-						Console.WriteLine(point.desc);
-					} catch { }
-				}
-				index += (uint)resp.points.Count();
-				finish = index >= resp.matchCount;
+				string str = string.Format("{0}: {1}", date, string.Join("   ", vals));
+				Console.WriteLine(str);
 			}
 
 
 
-
-			//Console.WriteLine(resp.matchCount);			
-			
-			/*foreach (Point pt in resp.points) {
-				Console.WriteLine(pt.desc);
-				foreach (byte tg in pt.sg) {
-					Console.WriteLine(tg);
-				}
-
-				//Console.WriteLine(pt.sg);
-			}*/
-			
 		}
 	}
 }

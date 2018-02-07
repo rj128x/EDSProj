@@ -347,6 +347,25 @@ namespace EDSProj
 			//_techGroups = Result;
 		}
 
+		public static double getVal(PointValue val) {
+			double res = 0;
+			try {
+				if (val.avSpecified)
+					res= (double)val.av;
+				if (val.bvSpecified)
+					res = val.bv.Value ? 1.0 : 0.0;
+				if (val.davSpecified)
+					res = (double)val.dav;
+				if (val.ipvSpecified)
+					res = (double)val.ipv;
+				if (val.pvSpecified)
+					res = (double)val.pv;
+			} catch {
+
+			}
+			return res;
+		}
+
 
 	}
 }

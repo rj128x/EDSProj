@@ -86,7 +86,7 @@ namespace EDSApp
 
 			String header = "";
 			foreach (EDSReportRequestRecord rec in report.RequestData.Values) {
-				header += String.Format("<th>{0}</th>", rec.Desc);
+				header += String.Format("<th width='100'>{0}</th>", rec.Desc);
 			}
 
 			TextWriter tW = new StreamWriter("out.html");
@@ -104,7 +104,7 @@ namespace EDSApp
 				foreach (double val in de.Value.Values) {
 					ValuesStr += String.Format("<td align='right'>{0:0.00}</td>", val);
 				}
-				tW.WriteLine(String.Format("<tr><th>{0}</th>{1}</tr>", dt.ToString("dd.MM.yyyy HH:mm:ss"), ValuesStr));				
+				tW.WriteLine(String.Format("<tr><th >{0}</th>{1}</tr>", dt.ToString("dd.MM.yyyy HH:mm:ss"), ValuesStr));				
 			}			
 			tW.WriteLine("</table></html>");
 			tW.Close();

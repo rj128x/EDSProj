@@ -139,7 +139,7 @@ namespace EDSProj.EDS
 						foreach (TabularRow row in rows) {
 							DateTime dt = EDSClass.fromTS(row.ts.second);
 							for (int i = 0; i < row.values.Count(); i++) {
-								double val = (double)row.values[i].value.av;
+								double val = EDSClass.getVal(row.values[i].value);
 								PointId point = points[i];
 								string resId = keys[i];
 								EDSReportRequestRecord request = RequestData[resId];
@@ -177,7 +177,7 @@ namespace EDSProj.EDS
 						TabularRow row = rows.First();
 						DateTime dt = EDSClass.fromTS(row.ts.second);
 						for (int i = 0; i < row.values.Count(); i++) {
-							double val = (double)row.values[i].value.av;
+							double val = EDSClass.getVal(row.values[i].value);
 							PointId point = points[i];
 							string resId = keys[i];
 							EDSReportRequestRecord request = RequestData[resId];
