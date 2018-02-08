@@ -25,6 +25,11 @@
   <FTPAOUser>AO_USER</FTPAOUser> <!--Пользователь FTP-->
   <FTPAOPassword>Ovation1</FTPAOPassword> <!--Пароль FTP-->
 
+  <DiadDBServer>sr-votges-015\sqlexpress</DiadDBServer>
+  <DiagDBPassword>sa</DiagDBPassword>
+  <DiagDBUser>psWD!159!</DiagDBUser>
+  <DiagDBName>Diagnostics</DiagDBName>
+
   <LogPath>c:/edscalc/logs</LogPath> 
 
 </Settings>

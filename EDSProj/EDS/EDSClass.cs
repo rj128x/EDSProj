@@ -269,7 +269,7 @@ namespace EDSProj
 					Logger.Info(String.Format("{3} {0}: {1} ({2})", status, progress * 100, msg, i));
 					ok = status == RequestStatus.REQUESTSUCCESS;
 					Single.ProcessInfo = String.Format("{0}: {1:0.00}% ({2})", msg, progress * 100, i);
-					finished = ok || i >= 1000;
+					finished = ok || i >= 1500;
 					if (Single.AbortCalc) {
 						Single.AbortCalc = false;
 						finished = true;
@@ -301,7 +301,7 @@ namespace EDSProj
 					Logger.Info(String.Format("{3} {0}: {1} ({2})", res.status, res.progress * 100, res.message, i));
 					ok = res.status == RequestStatus.REQUESTSUCCESS;
 					Single.ProcessInfo = String.Format("{0}: {1:0.00}% ({2})", res.message, res.progress * 100, i);
-					finished = ok || i >= 500;
+					finished = ok || i >= 100000;
 					if (Single.AbortCalc) {
 						Single.AbortCalc = false;
 						finished = true;

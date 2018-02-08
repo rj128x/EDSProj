@@ -14,8 +14,47 @@ namespace TestCNSL
 			Settings.init("Data/Settings.xml");
 			Logger.InitFileLogger(Settings.Single.LogPath, "pbrExport");
 
-			run();
-			Console.ReadLine();
+			DateTime date = DateTime.Parse("01.09.2017");
+			if (args.Length == 1) {
+				int day = Int32.Parse(args[0]);
+				runReports(date.AddDays(day));
+			}
+			
+			//run();
+			//Console.ReadLine();
+		}
+
+		public static void runReports(DateTime date) {
+			Logger.Info("статистика за " + date);
+			uint cnt;
+			uint total;
+			if (!EDSClass.Connected)
+				EDSClass.Connect();
+			ReportConfig[] reports = EDSClass.Client.getReportsConfigs(EDSClass.AuthStr, null, 0, 1000, out cnt, out total);
+			Console.WriteLine(reports.Count().ToString());
+			List<int> idsForRun = new List<int>();
+			foreach (ReportConfig report in reports) {
+				/*Console.WriteLine(report.id);
+				Console.WriteLine(report.reportDefinitionFile);
+				Console.WriteLine(report.inputValues);*/
+				if (report.reportDefinitionFile.Contains("pump")) {
+					idsForRun.Add((int)report.id);
+				}				
+			}
+
+			foreach (int id in idsForRun) {
+				Logger.Info(String.Format("Выполнение {0}", id));
+				GlobalReportRequest req = new GlobalReportRequest();
+				req.reportConfigId = (uint)id;
+				req.dtRef = new Timestamp() { second = EDSClass.toTS(date) };
+
+				uint reqId = EDSClass.Client.requestGlobalReport(EDSClass.AuthStr, req);
+				bool ok = EDSClass.ProcessQuery(reqId);
+				Logger.Info(ok.ToString());
+			}
+
+
+
 		}
 
 		public async static  void run() {
