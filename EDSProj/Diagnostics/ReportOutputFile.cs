@@ -70,5 +70,7 @@ namespace EDSProj.Diagnostics
 				return Double.NaN;
 			}
 		}
+
+
 	}
 }

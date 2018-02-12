@@ -29,6 +29,7 @@
   <DiagDBPassword>sa</DiagDBPassword>
   <DiagDBUser>psWD!159!</DiagDBUser>
   <DiagDBName>Diagnostics</DiagDBName>
+  <DiagFolder>c:/EDSReports/pump</DiagFolder>
 
   <LogPath>c:/edscalc/logs</LogPath> 
 

@@ -66,6 +66,13 @@ namespace EDSProj
 		public string FTPAOUser { get; set; }
 		public string FTPAOPassword { get; set; }
 
+		public string DiadDBServer { get; set; }
+		public string DiagDBPassword { get; set; }
+		public string DiagDBUser { get; set; }
+		public string DiagDBName { get; set; }
+
+		public string DiagFolder { get; set; }
+
 		public static Settings Single { get; protected set; }
 		public static void init(string filename) {
 			try {
