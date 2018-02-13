@@ -36,5 +36,10 @@ namespace EDSApp
 			WaterWindow win = new WaterWindow();
 			win.ShowDialog();
 		}
+
+		private void buttonDiag_Click(object sender, RoutedEventArgs e) {
+			DiagWindow win = new DiagWindow();
+			win.ShowDialog();
+		}
 	}
 }

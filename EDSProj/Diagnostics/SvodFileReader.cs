@@ -8,42 +8,7 @@ using System.Threading.Tasks;
 
 namespace EDSProj.Diagnostics
 {
-	public class SvodDataRecord
-	{
 
-		public DateTime DateStart { get; set; }
-		public DateTime DateEnd { get; set; }		
-		public double PAvg { get; set; }
-		public double PMin { get; set; }
-		public double PMax { get; set; }
-		public bool isUst { get; set; }
-
-		public double LN1Time { get; set; }
-		public double LN2Time { get; set; }
-		public double DN1Time { get; set; }
-		public double DN2Time { get; set; }
-		public double MNU1Time { get; set; }
-		public double MNU2Time { get; set; }
-		public double MNU3Time { get; set; }
-
-		public int LN1Pusk { get; set; }
-		public int LN2Pusk { get; set; }
-		public int DN1Pusk { get; set; }
-		public int DN2Pusk { get; set; }
-		public int MNU1Pusk { get; set; }
-		public int MNU2Pusk { get; set; }
-		public int MNU3Pusk { get; set; }
-
-		public double GPHot { get; set; }
-		public double GPCold { get; set; }
-		public double GPLevel { get; set; }
-
-		public double PPHot { get; set; }
-		public double PPCold { get; set; }
-		public double PPLevel { get; set; }
-
-
-	}
 
 	public class SvodFileReader
 	{
@@ -104,8 +69,8 @@ namespace EDSProj.Diagnostics
 					rec.PPCold = ReportOutputFile.getDouble(fileRec[23]);
 					rec.PPLevel = ReportOutputFile.getDouble(fileRec[24]);
 
-					rec.isUst = Math.Abs(rec.PAvg - rec.PMax) < 2;
-					rec.isUst = rec.isUst && Math.Abs(rec.PAvg - rec.PMin) < 2;
+					rec.IsUst = Math.Abs(rec.PAvg - rec.PMax) < 2;
+					rec.IsUst = rec.IsUst && Math.Abs(rec.PAvg - rec.PMin) < 2;
 					while (Data.ContainsKey(rec.DateStart))
 						rec.DateStart = rec.DateStart.AddMilliseconds(1);
 					Data.Add(rec.DateStart, rec);
@@ -134,7 +99,7 @@ namespace EDSProj.Diagnostics
 						de.Value.PMin.ToString().Replace(",", "."),
 						de.Value.PMax.ToString().Replace(",", "."),
 						de.Value.PAvg.ToString().Replace(",", "."),					
-						de.Value.isUst ? 1 : 0,
+						de.Value.IsUst ? 1 : 0,
 						de.Value.LN1Time.ToString().Replace(",", "."),
 						de.Value.LN2Time.ToString().Replace(",", "."),
 						de.Value.DN1Time.ToString().Replace(",", "."),

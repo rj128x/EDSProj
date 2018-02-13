@@ -8,23 +8,7 @@ using System.Threading.Tasks;
 
 namespace EDSProj.Diagnostics
 {	
-	public enum PumpTypeEnum { Drenage,Leakage,MNU}
 	
-	public class PumpDataRecord
-	{
-
-		public DateTime DateStart { get; set; }
-		public DateTime DateEnd { get; set; }
-		public PumpTypeEnum PumpType { get; set; }
-		public int PumpNum { get; set; }
-		public double RunTime { get; set; }
-		public double LevelStart { get; set; }
-		public double LevelStop { get; set; }
-		public double PAvg { get; set; }
-		public double PMin { get; set; }
-		public double PMax { get; set; }
-		public bool isUst { get; set; }
-	}
 
 
 	public class PumpFileReader
@@ -92,8 +76,8 @@ namespace EDSProj.Diagnostics
 					rec.LevelStop = ReportOutputFile.getDouble(fileRec[7]);
 					rec.PumpType = type;
 					rec.PumpNum = pumpNumber;
-					rec.isUst = Math.Abs(rec.PAvg - rec.PMax) < 2;
-					rec.isUst = rec.isUst && Math.Abs(rec.PAvg - rec.PMin) < 2;
+					rec.IsUst = Math.Abs(rec.PAvg - rec.PMax) < 2;
+					rec.IsUst = rec.IsUst && Math.Abs(rec.PAvg - rec.PMin) < 2;
 					while (Data.ContainsKey(rec.DateStart))
 						rec.DateStart = rec.DateStart.AddMilliseconds(1);
 					Data.Add(rec.DateStart, rec);
@@ -139,7 +123,7 @@ namespace EDSProj.Diagnostics
 						de.Value.PAvg.ToString().Replace(",", "."),
 						de.Value.PMin.ToString().Replace(",", "."),
 						de.Value.PMax.ToString().Replace(",", "."),
-						de.Value.isUst ? 1 : 0);
+						de.Value.IsUst ? 1 : 0);
 					insQueries.Add(ins);
 				}
 
