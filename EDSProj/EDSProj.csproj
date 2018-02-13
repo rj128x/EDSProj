@@ -71,6 +71,7 @@
     <Compile Include="AIS\AIS_OLD.cs" />
     <Compile Include="Diagnostics\PumpFileReader.cs" />
     <Compile Include="Diagnostics\ReportOutputFile.cs" />
+    <Compile Include="Diagnostics\SvodFileReader.cs" />
     <Compile Include="EDS\EDSClass.cs" />
     <Compile Include="EDS\EDSPointsClass.cs" />
     <Compile Include="EDS\EDSReport.cs" />

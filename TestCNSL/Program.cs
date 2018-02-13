@@ -14,10 +14,10 @@ namespace TestCNSL
 			Settings.init("Data/Settings.xml");
 			Logger.InitFileLogger(Settings.Single.LogPath, "pbrExport");
 
-			DateTime date = DateTime.Parse("01.09.2017");
+			DateTime date = DateTime.Parse("01.12.2018");
 			if (args.Length == 1) {
 				int day = Int32.Parse(args[0]);
-				runReports(date.AddDays(day));
+				runReports(date.AddDays(-day));
 			}
 			
 			//run();
@@ -53,7 +53,7 @@ namespace TestCNSL
 				Logger.Info(ok.ToString());
 			}
 
-
+			EDSClass.Client.Close();
 
 		}
 

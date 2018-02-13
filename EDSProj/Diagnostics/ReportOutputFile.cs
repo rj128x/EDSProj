@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -9,20 +10,27 @@ namespace EDSProj.Diagnostics
 {
 	public class ReportOutputFile
 	{
+		public static SqlConnection getConnection() {
+			String str = String.Format("Data Source={0};Initial Catalog={1};Persist Security Info=True;User ID={2};Password={3};Trusted_Connection=False;",
+				Settings.Single.DiadDBServer, Settings.Single.DiagDBName, Settings.Single.DiagDBUser, Settings.Single.DiagDBPassword);
+			return new SqlConnection(str);
+		}
+
 		public string FileName { get; set; }
 		public List<Dictionary<int, string>> Data { get; set; }
 		public ReportOutputFile(string fileName) {
 			FileName = fileName;
-			
+
 		}
 
 		public void ReadData() {
 			Data = new List<Dictionary<int, string>>();
 			TextReader reader = new StreamReader(FileName);
-			string all=reader.ReadToEnd();
+			string all = reader.ReadToEnd();
+			all = all.Replace(';' , ',');
 			reader.Close();
-			string[] lines = all.Split(new char[] { '\n' });
-			
+			string[] lines = all.Split(new string[] { "\r\n" },StringSplitOptions.RemoveEmptyEntries);
+
 			foreach (string line in lines) {
 				if (line.Contains("NODATA") || line.Contains("NEVER"))
 					continue;
@@ -39,6 +47,7 @@ namespace EDSProj.Diagnostics
 
 		public static DateTime getDate(string dateStr) {
 			try {
+				//dateStr = dateStr.Replace(".", "/");
 				string[] partsDateTime = dateStr.Split(new char[] { ' ' });
 				string timePart = partsDateTime[0];
 				string datePart = partsDateTime[1];
@@ -63,11 +72,22 @@ namespace EDSProj.Diagnostics
 
 		public static double getDouble(string valStr) {
 			try {
+				valStr = valStr.Replace("G", "");
+				valStr = valStr.Replace("B", "");
 				double val = Double.Parse(valStr);
 				return val;
 			} catch {
-				Logger.Info("Ошибка при разборе значения " + valStr);
-				return Double.NaN;
+				try {
+					if (valStr.Contains(","))
+						valStr = valStr.Replace(",", ".");
+					else if (valStr.Contains("."))
+						valStr = valStr.Replace(".", ",");
+					double val = Double.Parse(valStr);
+					return val;
+				} catch {
+					Logger.Info("Ошибка при разборе значения " + valStr);
+					return Double.NaN;
+				}
 			}
 		}
 

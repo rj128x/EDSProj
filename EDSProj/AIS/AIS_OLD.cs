@@ -62,7 +62,7 @@ namespace EDSProj.AIS
 			}
 		}
 
-		public static string DateFormat = "yyyy-MM-dd HH:mm:ss";
+		public static string DateFormat = "yyyy-mm-dd HH:MM:ss";
 
 		public static SqlConnection getConnection(string dbName) {
 			String str = String.Format("Data Source={0};Initial Catalog={1};Persist Security Info=True;User ID={2};Password={3};Trusted_Connection=False;",

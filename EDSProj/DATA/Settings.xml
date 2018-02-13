@@ -26,10 +26,10 @@
   <FTPAOPassword>Ovation1</FTPAOPassword> <!--Пароль FTP-->
 
   <DiadDBServer>sr-votges-015\sqlexpress</DiadDBServer>
-  <DiagDBPassword>sa</DiagDBPassword>
-  <DiagDBUser>psWD!159!</DiagDBUser>
+  <DiagDBPassword>psWD!159!</DiagDBPassword>
+  <DiagDBUser>sa</DiagDBUser>
   <DiagDBName>Diagnostics</DiagDBName>
-  <DiagFolder>c:/EDSReports/pump</DiagFolder>
+  <DiagFolder>c:/EDSReports/pump/csv/</DiagFolder>
 
   <LogPath>c:/edscalc/logs</LogPath> 
 

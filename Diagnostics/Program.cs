@@ -18,21 +18,42 @@ namespace Diagnostics
 				string task = args[0];
 				task = task.ToLower();
 				switch (task) {
-					case "processPump":
+					case "processpump":
 						try {
 							DirectoryInfo di = new DirectoryInfo(Settings.Single.DiagFolder);
-							DirectoryInfo newDI = new DirectoryInfo(Settings.Single + "/archive");
+							DirectoryInfo newDI = new DirectoryInfo(Settings.Single.DiagFolder + "/archive");
 							if (!newDI.Exists)
 								newDI.Create();
 							FileInfo[] files = di.GetFiles();
 							foreach (FileInfo fi in files) {
 								try {
-									PumpFileReader pumpReader = new PumpFileReader(fi.FullName);
-									bool ok=pumpReader.ReadData();
-									if (ok) {
-										ok = pumpReader.writeToDB(4);
+									if (fi.Name.Contains("DN") || fi.Name.Contains("LN") || fi.Name.Contains("MNU")) {
+										Logger.Info("Обработка файла " + fi.FullName);
+										PumpFileReader pumpReader = new PumpFileReader(fi.FullName);
+										Logger.Info("====Чтение данных");
+										bool ok = pumpReader.ReadData();
+										Logger.Info("======" + ok);
 										if (ok) {
-											fi.MoveTo(newDI.FullName);
+											Logger.Info("====Запись данных");
+											ok = pumpReader.writeToDB(4);
+											Logger.Info("======" + ok);
+											if (ok) {
+												fi.MoveTo(newDI.FullName + "/" + fi.Name);
+											}
+										}
+									}else if (fi.Name.Contains("SVOD")) {
+										Logger.Info("Обработка файла " + fi.FullName);
+										SvodFileReader pumpReader = new SvodFileReader(fi.FullName);
+										Logger.Info("====Чтение данных");
+										bool ok = pumpReader.ReadData();
+										Logger.Info("======" + ok);
+										if (ok) {
+											Logger.Info("====Запись данных");
+											ok = pumpReader.writeToDB(4);
+											Logger.Info("======" + ok);
+											if (ok) {
+												fi.MoveTo(newDI.FullName + "/" + fi.Name);
+											}
 										}
 									}
 								}catch (Exception e) {
