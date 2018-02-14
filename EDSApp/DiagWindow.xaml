@@ -5,35 +5,126 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EDSApp"
         mc:Ignorable="d"
+        xmlns:wfi="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
+        xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
+        xmlns:zd="clr-namespace:ZedGraph;assembly=ZedGraph"
         Title="DiagWindow" Height="600" Width="800">
     <Grid>
         <Grid Margin="0,20,0,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="30"/>
-                <RowDefinition Height="*"/>                
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>                
+            <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <TabControl Grid.Column="0" Grid.Row="1">
                 <TabItem Header="Дренажные насосы">
-                    
+                    <Grid>
+                        <Grid.RowDefinitions >
+                            <RowDefinition Height="30"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Border Grid.Row="0">
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox Content="Делить по мощности" Name="chbDNSplitPower" IsChecked="False"  VerticalAlignment="Center"/>
+                                <TextBox Text="10" Name="txtDNSplitPower"/>
+                                <Button Content="Сформировать" Name="drenClick" Click="drenClick_Click"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Row="1">
+                            <TabControl Grid.Row="1">
+                                <TabItem Header="Длительность работы">
+                                    <WindowsFormsHost>
+                                        <zd:ZedGraphControl x:Name="z1"/>
+                                    </WindowsFormsHost>
+                                </TabItem>
+                                <TabItem Header="Работа в сутки">
+                                    <WindowsFormsHost>
+                                        <zd:ZedGraphControl x:Name="z2"/>
+                                    </WindowsFormsHost>
+                                </TabItem>
+                                <TabItem Header="Пусков в сутки">
+                                    <WindowsFormsHost>
+                                        <zd:ZedGraphControl x:Name="z3"/>
+                                    </WindowsFormsHost>
+                                </TabItem>
+                            </TabControl>
+                        </Border>
+                    </Grid>
                 </TabItem>
-                <TabItem Header="Лекажные насосы">
 
-                </TabItem>
                 <TabItem Header="Насосы МНУ">
+                    <Grid>
+                        <Grid.RowDefinitions >
+                            <RowDefinition Height="30"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Border Grid.Row="0">
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox Content="Делить по мощности" Name="chbMNUSplitPower" IsChecked="False"  VerticalAlignment="Center"/>
+                                <TextBox Text="10" Name="txtMNUSplitPower"/>
+                                <Button Content="Сформировать" Name="mnuClick" Click="mnuClick_Click"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Row="1">
+                            <TabControl Grid.Row="1">
+                                <TabItem Header="Длительность работы">
+                                    <WindowsFormsHost>
+                                        <zd:ZedGraphControl x:Name="z4"/>
+                                    </WindowsFormsHost>
+                                </TabItem>
+                                <TabItem Header="Работа в сутки">
+                                    <WindowsFormsHost>
+                                        <zd:ZedGraphControl x:Name="z5"/>
+                                    </WindowsFormsHost>
+                                </TabItem>
+                                <TabItem Header="Пусков в сутки">
+                                    <WindowsFormsHost>
+                                        <zd:ZedGraphControl x:Name="z6"/>
+                                    </WindowsFormsHost>
+                                </TabItem>
+                            </TabControl>
+                        </Border>
+                    </Grid>
 
                 </TabItem>
                 <TabItem Header="Свод">
+                    <Grid>
+                        <Grid.RowDefinitions >
+                            <RowDefinition Height="30"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Border Grid.Row="0">
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox Content="Делить по гор. маслу" Name="chbOilSplitHot" IsChecked="False"  VerticalAlignment="Center" />
+                                <CheckBox Content="Делить по хол. маслу" Name="chbOilSplitCold" IsChecked="False"  VerticalAlignment="Center" />
+                                <TextBox Text="10" Name="txtOilSplitTemp"/>
+                                <Button Content="Сформировать" Name="oilClick" Click="oilClick_Click"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Row="1">
+                            <TabControl Grid.Row="1">
+                                <TabItem Header="ГП">
+                                    <WindowsFormsHost>
+                                        <zd:ZedGraphControl x:Name="z7"/>
+                                    </WindowsFormsHost>
+                                </TabItem>
+                                <TabItem Header="ПП">
+                                    <WindowsFormsHost>
+                                        <zd:ZedGraphControl x:Name="z8"/>
+                                    </WindowsFormsHost>
+                                </TabItem>
 
+                            </TabControl>
+                        </Border>
+                    </Grid>
                 </TabItem>
             </TabControl>
-            <Border Height="30" Width="300" HorizontalAlignment="Right">
+            <Border Height="30" Width="200" HorizontalAlignment="Right">
                 <StackPanel  Orientation="Horizontal">
                     <DatePicker Name="clndFrom"/>
                     <DatePicker Name="clndTo"/>
-                    <Button Content="Сформировать" Name="btnCreate" Click="btnCreate_Click"/>
                 </StackPanel>
             </Border>
         </Grid>

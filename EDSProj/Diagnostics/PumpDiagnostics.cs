@@ -63,15 +63,22 @@ namespace EDSProj.Diagnostics
 	}
 
 
+
 	public class PumpDiagnostics
 	{
 		public DateTime StartDate { get; set; }
 		public DateTime EndDate { get; set; }
 		public static string DateFormat = "yyyy-MM-dd HH:mm:ss";
 
+		public PumpDiagnostics(DateTime dateStart,DateTime dateEnd) {
+			this.StartDate = dateStart;
+			this.EndDate = dateEnd;
+		}
+
 		public Dictionary<DateTime, PumpDataRecord> ReadDataPump(PumpTypeEnum type,int powerStart,int powerStop) {
 			SqlConnection con = ReportOutputFile.getConnection();
 			con.Open();
+
 			string query = String.Format("Select * from pumpTable where dateStart>='{0}' and dateEnd<='{1}' and isUst=1 and pAvg>={2} and pAvg<={3} and PumpType='{4}'",
 				StartDate.ToString(DateFormat), EndDate.ToString(DateFormat), powerStart, powerStop,type.ToString());
 
@@ -143,7 +150,66 @@ namespace EDSProj.Diagnostics
 				rec.PPHot = reader.GetDouble(reader.GetOrdinal("PP_Hot"));
 				rec.PPCold = reader.GetDouble(reader.GetOrdinal("PP_Cold"));
 				rec.PPLevel = reader.GetDouble(reader.GetOrdinal("PP_Level"));
+				Data.Add(rec.DateStart,rec);
+			}
+			return Data;
+		}
 
+		public Dictionary<DateTime, SvodDataRecord> ReadPumpSvod(string groupName, double start, double stop) {
+			SqlConnection con = ReportOutputFile.getConnection();
+			con.Open();
+			string query = String.Format(
+@"select  
+	format(datestart, 'dd.MM.yyyy') as dt,
+	min(dateStart) as mindate,
+	sum(ln1_time) as ln1Time,
+	sum(ln2_time) as ln2Time,
+	sum(dn1_time) as dn1Time,
+	sum(dn2_time) as dn2Time,
+	sum(mnu1_time) as mnu1Time,
+	sum(mnu2_time) as mnu2Time,
+	sum(mnu3_time) as mnu3Time,
+
+	sum(ln1_pusk) as ln1Pusk,
+	sum(ln2_pusk) as ln2Pusk,
+	sum(dn1_pusk) as dn1Pusk,
+	sum(dn2_pusk) as dn2Pusk,
+	sum(mnu1_pusk) as mnu1Pusk,
+	sum(mnu2_pusk) as mnu2Pusk,
+	sum(mnu3_pusk) as mnu3Pusk
+from SvodTable
+where dateStart>='{0}' and dateEnd<='{1}'  and {2}>={3} and {2}<={4}
+group by format(datestart, 'dd.MM.yyyy')
+order by mindate",
+				StartDate.ToString(DateFormat), EndDate.ToString(DateFormat), groupName, start.ToString().Replace(",", "."), stop.ToString().Replace(",", "."));
+
+			SqlCommand com = con.CreateCommand();
+			com.CommandText = query;
+
+			Dictionary<DateTime, SvodDataRecord> Data = new Dictionary<DateTime, SvodDataRecord>();
+			SqlDataReader reader = com.ExecuteReader();
+			while (reader.Read()) {
+				SvodDataRecord rec = new SvodDataRecord();
+				rec.DateStart = reader.GetDateTime(reader.GetOrdinal("mindate"));
+				rec.DateEnd = rec.DateStart.AddDays(1);
+				rec.IsUst = true;
+
+				rec.LN1Time = reader.GetDouble(reader.GetOrdinal("ln1Time"));
+				rec.LN2Time = reader.GetDouble(reader.GetOrdinal("ln2Time"));
+				rec.DN1Time = reader.GetDouble(reader.GetOrdinal("dn1Time"));
+				rec.DN2Time = reader.GetDouble(reader.GetOrdinal("dn2Time"));
+				rec.MNU1Time = reader.GetDouble(reader.GetOrdinal("mnu1Time"));
+				rec.MNU2Time = reader.GetDouble(reader.GetOrdinal("mnu2Time"));
+				rec.MNU3Time = reader.GetDouble(reader.GetOrdinal("mnu3Time"));
+
+				rec.LN1Pusk = reader.GetInt32(reader.GetOrdinal("ln1Pusk"));
+				rec.LN2Pusk = reader.GetInt32(reader.GetOrdinal("ln2Pusk"));
+				rec.DN1Pusk = reader.GetInt32(reader.GetOrdinal("dn1Pusk"));
+				rec.DN2Pusk = reader.GetInt32(reader.GetOrdinal("dn2Pusk"));
+				rec.MNU1Pusk = reader.GetInt32(reader.GetOrdinal("mnu1Pusk"));
+				rec.MNU2Pusk = reader.GetInt32(reader.GetOrdinal("mnu2Pusk"));
+				rec.MNU3Pusk = reader.GetInt32(reader.GetOrdinal("mnu3Pusk"));
+				Data.Add(rec.DateStart, rec);
 			}
 			return Data;
 		}
