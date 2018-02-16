@@ -13,7 +13,7 @@
   <EDSPassword>Ovation123</EDSPassword>
   
   <FTPActive>false</FTPActive> <!--Активный режим FTP-->
-  <FTPServer>10.7.224.2</FTPServer> <!--Адрес FTP сервера-->
+  <FTPServer>10.7.227.12</FTPServer> <!--Адрес FTP сервера-->
   <FTPPort>21</FTPPort> <!--Порт 21-->
   <FTPUser>Administrator</FTPUser> <!--Пользователь FTP-->
   <FTPPassword>Ovation1</FTPPassword> <!--Пароль FTP-->
@@ -29,7 +29,7 @@
   <DiagDBPassword>psWD!159!</DiagDBPassword>
   <DiagDBUser>sa</DiagDBUser>
   <DiagDBName>Diagnostics</DiagDBName>
-  <DiagFolder>c:/EDSReports/pump/csv/</DiagFolder>
+  <DiagFolder>\\10.7.227.12\c$\EDSReports\pump\csv\</DiagFolder>
 
   <LogPath>c:/edscalc/logs</LogPath> 
 

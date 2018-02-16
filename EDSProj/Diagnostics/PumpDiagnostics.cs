@@ -79,7 +79,7 @@ namespace EDSProj.Diagnostics
 			SqlConnection con = ReportOutputFile.getConnection();
 			con.Open();
 
-			string query = String.Format("Select * from pumpTable where dateStart>='{0}' and dateEnd<='{1}' and isUst=1 and pAvg>={2} and pAvg<={3} and PumpType='{4}'",
+			string query = String.Format("Select * from pumpTable where dateStart>='{0}' and dateEnd<='{1}' and isUst=1 and pAvg>={2} and pAvg<={3} and PumpType='{4}' order by dateStart",
 				StartDate.ToString(DateFormat), EndDate.ToString(DateFormat), powerStart, powerStop,type.ToString());
 
 			SqlCommand com = con.CreateCommand();
@@ -110,7 +110,7 @@ namespace EDSProj.Diagnostics
 		public Dictionary<DateTime, SvodDataRecord> ReadSvod(string groupName,double start,double stop) {
 			SqlConnection con = ReportOutputFile.getConnection();
 			con.Open();
-			string query = String.Format("Select * from svodTable where dateStart>='{0}' and dateEnd<='{1}' and isUst=1 and {2}>={3} and {2}<={4}",
+			string query = String.Format("Select * from svodTable where dateStart>='{0}' and dateEnd<='{1}' and isUst=1 and {2}>={3} and {2}<={4} order by dateStart",
 				StartDate.ToString(DateFormat), EndDate.ToString(DateFormat), groupName, start.ToString().Replace(",","."), stop.ToString().Replace(",", "."));
 
 			SqlCommand com = con.CreateCommand();
@@ -176,7 +176,7 @@ namespace EDSProj.Diagnostics
 	sum(dn2_pusk) as dn2Pusk,
 	sum(mnu1_pusk) as mnu1Pusk,
 	sum(mnu2_pusk) as mnu2Pusk,
-	sum(mnu3_pusk) as mnu3Pusk
+	sum(mnu3_pusk) as mnu3Pusk	
 from SvodTable
 where dateStart>='{0}' and dateEnd<='{1}'  and {2}>={3} and {2}<={4}
 group by format(datestart, 'dd.MM.yyyy')
@@ -210,6 +210,35 @@ order by mindate",
 				rec.MNU2Pusk = reader.GetInt32(reader.GetOrdinal("mnu2Pusk"));
 				rec.MNU3Pusk = reader.GetInt32(reader.GetOrdinal("mnu3Pusk"));
 				Data.Add(rec.DateStart, rec);
+			}
+			return Data;
+		}
+
+		public Dictionary<DateTime, double> ReadGGRun() {
+			SqlConnection con = ReportOutputFile.getConnection();
+			con.Open();
+			string query = String.Format(
+@"select  
+	format(datestart, 'dd.MM.yyyy') as dt,
+	min(dateStart) as mindate,
+	count(p_avg) as timeRun
+from SvodTable
+where dateStart>='{0}' and dateEnd<='{1}'  and p_avg>10
+group by format(datestart, 'dd.MM.yyyy')
+order by mindate",
+				StartDate.ToString(DateFormat), EndDate.ToString(DateFormat));
+
+			SqlCommand com = con.CreateCommand();
+			com.CommandText = query;
+
+			Dictionary<DateTime, double> Data = new Dictionary<DateTime, double>();
+			SqlDataReader reader = com.ExecuteReader();
+			while (reader.Read()) {				
+				DateTime dateStart = reader.GetDateTime(reader.GetOrdinal("mindate"));
+				
+				double run = reader.GetInt32(reader.GetOrdinal("timeRun"));
+				
+				Data.Add(dateStart, run);
 			}
 			return Data;
 		}

@@ -84,12 +84,22 @@
                                         <zd:ZedGraphControl x:Name="z6"/>
                                     </WindowsFormsHost>
                                 </TabItem>
+                                <TabItem Header="ЛН Работа в сутки">
+                                    <WindowsFormsHost>
+                                        <zd:ZedGraphControl x:Name="z51"/>
+                                    </WindowsFormsHost>
+                                </TabItem>
+                                <TabItem Header="ЛН Пусков в сутки">
+                                    <WindowsFormsHost>
+                                        <zd:ZedGraphControl x:Name="z61"/>
+                                    </WindowsFormsHost>
+                                </TabItem>
                             </TabControl>
                         </Border>
                     </Grid>
 
                 </TabItem>
-                <TabItem Header="Свод">
+                <TabItem Header="Уровень масла">
                     <Grid>
                         <Grid.RowDefinitions >
                             <RowDefinition Height="30"/>
@@ -121,7 +131,7 @@
                     </Grid>
                 </TabItem>
             </TabControl>
-            <Border Height="30" Width="200" HorizontalAlignment="Right">
+            <Border Height="30" Width="200" HorizontalAlignment="Left">
                 <StackPanel  Orientation="Horizontal">
                     <DatePicker Name="clndFrom"/>
                     <DatePicker Name="clndTo"/>

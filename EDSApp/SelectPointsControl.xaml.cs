@@ -52,11 +52,17 @@ namespace EDSApp
 
 		public void RefreshSelection(string text) {
 			FilteredPoints.Clear();
-			Regex regex = new Regex(text);
+			Regex regex = new Regex(text,RegexOptions.IgnoreCase);
+						
+			List<int> groups = new List<int>();
+			/*foreach (TechGroupInfo tg in TechGroups) {
+				groups.Add(tg.Id);
+			}
+			FilteredPoints=AllPoints.Values.TakeWhile(p => p.Groups.Intersect(groups).Count() > 0).ToList();*/
 			foreach (EDSPointInfo point in AllPoints.Values) {
-				foreach (TechGroupInfo tg in TechGroups) {
-					if (FilteredPoints.Contains(point))
-						continue;
+				if (FilteredPoints.Contains(point))
+					continue;
+				foreach (TechGroupInfo tg in TechGroups) {					
 					if (tg.Selected) {
 						if (point.Groups.Contains(tg.Id)) {
 							if (regex.Match(point.FullName).Success)

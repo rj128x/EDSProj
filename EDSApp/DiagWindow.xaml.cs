@@ -24,16 +24,17 @@ namespace EDSApp
 		public List<System.Drawing.Color> Colors;
 		public DiagWindow() {
 			InitializeComponent();
-			clndFrom.SelectedDate = DateTime.Now.Date.AddMonths(-1);
+			clndFrom.SelectedDate = DateTime.Now.Date.AddMonths(-3);
 			clndTo.SelectedDate = DateTime.Now.Date;
-			Colors = new List<System.Drawing.Color>();
-			Colors.Add(System.Drawing.Color.Black);
+			Colors = new List<System.Drawing.Color>();			
 			Colors.Add(System.Drawing.Color.Red);
 			Colors.Add(System.Drawing.Color.Green);
 			Colors.Add(System.Drawing.Color.Blue);
 			Colors.Add(System.Drawing.Color.Purple);
+			Colors.Add(System.Drawing.Color.YellowGreen);
 			Colors.Add(System.Drawing.Color.Pink);
 			Colors.Add(System.Drawing.Color.Orange);
+			Colors.Add(System.Drawing.Color.Gray);			
 		}
 
 		private void btnCreate_Click(object sender, RoutedEventArgs e) {
@@ -43,8 +44,11 @@ namespace EDSApp
 		private void drenClick_Click(object sender, RoutedEventArgs e) {
 			int splitPower = Int32.Parse(txtDNSplitPower.Text);
 			createPumpRunChart(z1, PumpTypeEnum.Drenage, chbDNSplitPower.IsChecked.Value, splitPower);
-			createPumpPuskChart(z2, PumpTypeEnum.Drenage, true);
-			createPumpPuskChart(z3, PumpTypeEnum.Drenage,  false);
+			PumpDiagnostics report = new PumpDiagnostics(clndFrom.SelectedDate.Value, clndTo.SelectedDate.Value);
+			Dictionary<DateTime, SvodDataRecord> Data = report.ReadPumpSvod("P_Avg", -1, 200);
+			Dictionary<DateTime, double> DataRun = report.ReadGGRun();
+			createPumpPuskChart(z2, PumpTypeEnum.Drenage,Data,DataRun, true);
+			createPumpPuskChart(z3, PumpTypeEnum.Drenage, Data,DataRun,  false);
 
 		}
 
@@ -53,7 +57,8 @@ namespace EDSApp
 			chart.GraphPane.XAxis.Type = AxisType.Date;
 			chart.GraphPane.XAxis.Scale.Format = "dd.MM";
 			chart.GraphPane.XAxis.Title.IsVisible = false;
-			chart.GraphPane.YAxis.Title.IsVisible = false;
+			chart.GraphPane.YAxis.Title.IsVisible = true;
+			chart.GraphPane.YAxis.Title.FontSpec.Size = 10;
 			chart.GraphPane.Title.IsVisible = false;
 		}
 
@@ -68,7 +73,7 @@ namespace EDSApp
 			if (split) {
 				powers.Add(-1);
 				int power = 35;
-				while (power + splitPower <= 115) {
+				while (power  <= 115) {
 					powers.Add(power);
 					power += splitPower;
 				}
@@ -108,27 +113,21 @@ namespace EDSApp
 			chart.Invalidate();
 		}
 
-		public void createPumpPuskChart(ZedGraphControl chart, PumpTypeEnum type, bool time) {
+		public void createPumpPuskChart(ZedGraphControl chart, PumpTypeEnum type, Dictionary<DateTime, SvodDataRecord> Data, Dictionary<DateTime,double> DataRun, bool time) {
 			int ind = 0;
-			PumpDiagnostics report = new PumpDiagnostics(clndFrom.SelectedDate.Value, clndTo.SelectedDate.Value);
-			Dictionary<DateTime, SvodDataRecord> Data = new Dictionary<DateTime, SvodDataRecord>();
-
 			prepareChart(chart);
-
-
-
 			List<int> powers = new List<int>();
 
-			Data = report.ReadPumpSvod("P_Avg", -1, 200);
-
-
 			if (Data.Count > 0) {
-				System.Drawing.Color color = Colors[ind++ % 7];
+				System.Drawing.Color color = Colors[0];
 				PointPairList points = new PointPairList();
 				foreach (KeyValuePair<DateTime, SvodDataRecord> de in Data) {
 					switch (type) {
 						case PumpTypeEnum.Drenage:
 							points.Add(new PointPair(new XDate(de.Key), time ? de.Value.DN1Time + de.Value.DN2Time : de.Value.DN1Pusk + de.Value.DN2Pusk));
+							break;
+						case PumpTypeEnum.Leakage:
+							points.Add(new PointPair(new XDate(de.Key), time ? de.Value.LN1Time + de.Value.LN2Time : de.Value.LN1Pusk + de.Value.LN2Pusk));
 							break;
 						case PumpTypeEnum.MNU:
 							points.Add(new PointPair(new XDate(de.Key), time ? de.Value.MNU1Time + de.Value.MNU2Time + de.Value.MNU3Time : de.Value.MNU1Pusk + de.Value.MNU2Pusk + de.Value.MNU3Pusk));
@@ -141,6 +140,21 @@ namespace EDSApp
 				line.Symbol.Fill = new Fill(color);
 			}
 
+			if (DataRun.Count > 0) {
+				System.Drawing.Color color = Colors[1];
+				PointPairList points = new PointPairList();
+				foreach (KeyValuePair<DateTime, double> de in DataRun) {
+					points.Add(new PointPair(new XDate(de.Key), de.Value));
+
+				}
+				LineItem line = chart.GraphPane.AddCurve(String.Format("Работа ГГ"), points, color, SymbolType.Circle);
+				line.Line.IsVisible = true;
+				line.Symbol.Size = 1;
+				line.Symbol.Fill = new Fill(color);
+				//chart.GraphPane.YAxisList.Add("ГГ");
+				line.IsY2Axis = true;
+			}
+
 			chart.AxisChange();
 			chart.Invalidate();
 		}
@@ -148,8 +162,13 @@ namespace EDSApp
 		private void mnuClick_Click(object sender, RoutedEventArgs e) {
 			int splitPower = Int32.Parse(txtMNUSplitPower.Text);
 			createPumpRunChart(z4, PumpTypeEnum.MNU, chbMNUSplitPower.IsChecked.Value, splitPower);
-			createPumpPuskChart(z5, PumpTypeEnum.MNU, true);
-			createPumpPuskChart(z6, PumpTypeEnum.MNU, false);
+			PumpDiagnostics report = new PumpDiagnostics(clndFrom.SelectedDate.Value, clndTo.SelectedDate.Value);
+			Dictionary<DateTime, SvodDataRecord> Data = report.ReadPumpSvod("P_Avg", -1, 200);
+			Dictionary<DateTime, double> DataRun = report.ReadGGRun();
+			createPumpPuskChart(z5, PumpTypeEnum.MNU,Data,DataRun, true);
+			createPumpPuskChart(z6, PumpTypeEnum.MNU, Data,DataRun, false);
+			createPumpPuskChart(z51, PumpTypeEnum.Leakage, Data,DataRun, true);
+			createPumpPuskChart(z61, PumpTypeEnum.Leakage, Data,DataRun, false);
 		}
 
 		public void createOilChart(ZedGraphControl chart, bool gp, bool splitHot, bool splitCold, double step) {
@@ -178,12 +197,15 @@ namespace EDSApp
 			foreach (double t in AllTemps) {
 				string headerRun = "";
 				string headerStop = "";
+				string header = "";
 				if (!split) {
 					headerRun = "Уровень масла (ГГ в работе)";
 					headerStop = "Уровень масла (ГГ стоит)";
+					header = "Уровень масла";
 				} else {
 					headerRun = String.Format("Уровень при t {0:0.0}-{1:0.0} (ГГ в работе)", t, t + step);
 					headerStop = String.Format("Уровень при t {0:0.0}-{1:0.0} (стоит)", t, t + step);
+					header = String.Format("Уровень при t {0:0.0}-{1:0.0}", t, t + step);
 				}
 
 				PointPairList pointsRun = new PointPairList();
@@ -204,14 +226,14 @@ namespace EDSApp
 					}
 				}
 				System.Drawing.Color color = Colors[ind++ % 7];
-				if (pointsRun.Count > 10) {
-					LineItem line = chart.GraphPane.AddCurve(headerRun, pointsRun, color, SymbolType.Circle);
+				if (pointsRun.Count > 5) {
+					LineItem line = chart.GraphPane.AddCurve(headerRun, pointsRun, color, SymbolType.Diamond);
 					line.Line.IsVisible = false;
 					line.Symbol.Size = 2;
 					line.Symbol.Fill = new Fill(color);
 				}
 				//line.Line.IsVisible = false;
-				if (pointsRun.Count > 10) {
+				if (pointsStop.Count > 5) {
 					LineItem line = chart.GraphPane.AddCurve(headerStop, pointsStop, color, SymbolType.Circle);
 					line.Line.IsVisible = false;
 					line.Symbol.Size = 2;

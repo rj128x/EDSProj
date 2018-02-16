@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,6 +21,9 @@ namespace Diagnostics
 				switch (task) {
 					case "processpump":
 						try {
+							NetworkCredential nc = new NetworkCredential("10.7.227.12\\Administrator", "Ovation1", "");
+							CredentialCache cache = new CredentialCache();
+							cache.Add(new Uri(@"\\10.7.227.12"),  "Basic", nc);
 							DirectoryInfo di = new DirectoryInfo(Settings.Single.DiagFolder);
 							DirectoryInfo newDI = new DirectoryInfo(Settings.Single.DiagFolder + "/archive");
 							if (!newDI.Exists)
