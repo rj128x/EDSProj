@@ -242,5 +242,47 @@ order by mindate",
 			}
 			return Data;
 		}
+
+		public Dictionary<DateTime,double> Approx(Dictionary<DateTime,double> input) {
+			Dictionary<DateTime, double> result = new Dictionary<DateTime, double>();
+			Dictionary<double, double> inputDouble = new Dictionary<double, double>();
+			Dictionary<double, double> resultDouble = new Dictionary<double, double>();
+			Dictionary<DateTime, double> dateKeys = new Dictionary<DateTime, double>();
+
+			DateTime first = input.Keys.First();
+			foreach (DateTime date in input.Keys) {
+				double sec = (date - first).TotalSeconds;
+				dateKeys.Add(date, sec);
+				inputDouble.Add(sec, input[date]);
+				result.Add(date, 0);
+				resultDouble.Add(sec, 0);
+			}
+
+			double sumXY = 0;
+			double sumX = 0;
+			double sumY = 0;
+			double sumX2 = 0;
+
+			foreach (KeyValuePair<double,double> de in inputDouble) {
+				sumX += de.Key;
+				sumY += de.Value;
+				sumX2 += de.Key * de.Key;
+				sumXY += de.Key * de.Value;
+			}
+
+			int n = input.Count;
+
+			double a = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX*sumX);
+			double b = (sumY - a * sumX) / n;
+
+			foreach (KeyValuePair<DateTime,double> de in input) {
+				double x = dateKeys[de.Key];
+				double val = a * x + b;
+				result[de.Key] = val;
+			}
+
+
+			return result;
+		}
 	}
 }

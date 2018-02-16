@@ -59,7 +59,7 @@ namespace EDSApp
 			chart.GraphPane.XAxis.Title.IsVisible = false;
 			chart.GraphPane.YAxis.Title.IsVisible = true;
 			chart.GraphPane.YAxis.Title.FontSpec.Size = 10;
-			chart.GraphPane.Title.IsVisible = false;
+			chart.GraphPane.Title.IsVisible = false;			
 		}
 
 		public void createPumpRunChart(ZedGraphControl chart, PumpTypeEnum type, bool split, int splitPower) {
@@ -96,17 +96,30 @@ namespace EDSApp
 					}
 				}
 
-
+				
 				if (Data.Count > 0) {
+					Dictionary<DateTime, double> DataForApprox = new Dictionary<DateTime, double>();
 					System.Drawing.Color color = Colors[ind++ % 7];
 					PointPairList points = new PointPairList();
 					foreach (KeyValuePair<DateTime, PumpDataRecord> de in Data) {
 						points.Add(new PointPair(new XDate(de.Key), de.Value.RunTime));
+						DataForApprox.Add(de.Key, de.Value.RunTime);
 					}
-					LineItem line = chart.GraphPane.AddCurve(header, points, color, SymbolType.Circle);
+					LineItem line = chart.GraphPane.AddCurve("", points, color, SymbolType.Circle);
 					line.Line.IsVisible = false;
 					line.Symbol.Fill = new Fill(color);
-					line.Symbol.Size = 2;
+					line.Symbol.Size = 1.5F;					
+
+					Dictionary<DateTime, double> appr = report.Approx(DataForApprox);
+					points = new PointPairList();
+					foreach (KeyValuePair<DateTime, double> de in appr) {
+						points.Add(new PointPair(new XDate(de.Key), de.Value));
+					}
+
+					line = chart.GraphPane.AddCurve(header, points, color, SymbolType.None);
+					line.Line.IsVisible = true;
+					line.Line.Style = System.Drawing.Drawing2D.DashStyle.Dash;
+
 				}
 			}
 			chart.AxisChange();
@@ -122,17 +135,21 @@ namespace EDSApp
 				System.Drawing.Color color = Colors[0];
 				PointPairList points = new PointPairList();
 				foreach (KeyValuePair<DateTime, SvodDataRecord> de in Data) {
+					double val = 0;
 					switch (type) {
 						case PumpTypeEnum.Drenage:
-							points.Add(new PointPair(new XDate(de.Key), time ? de.Value.DN1Time + de.Value.DN2Time : de.Value.DN1Pusk + de.Value.DN2Pusk));
+							val = time ? de.Value.DN1Time + de.Value.DN2Time : de.Value.DN1Pusk + de.Value.DN2Pusk;
 							break;
 						case PumpTypeEnum.Leakage:
-							points.Add(new PointPair(new XDate(de.Key), time ? de.Value.LN1Time + de.Value.LN2Time : de.Value.LN1Pusk + de.Value.LN2Pusk));
+							val = time ? de.Value.LN1Time + de.Value.LN2Time : de.Value.LN1Pusk + de.Value.LN2Pusk;
 							break;
 						case PumpTypeEnum.MNU:
-							points.Add(new PointPair(new XDate(de.Key), time ? de.Value.MNU1Time + de.Value.MNU2Time + de.Value.MNU3Time : de.Value.MNU1Pusk + de.Value.MNU2Pusk + de.Value.MNU3Pusk));
+							val = time ? de.Value.MNU1Time + de.Value.MNU2Time + de.Value.MNU3Time : de.Value.MNU1Pusk + de.Value.MNU2Pusk + de.Value.MNU3Pusk;
 							break;
 					}
+					points.Add(new PointPair(new XDate(de.Key), val));
+
+
 				}
 				LineItem line = chart.GraphPane.AddCurve(String.Format("{0}", time ? "Работа (ceк)" : "Пусков"), points, color, SymbolType.Circle);
 				line.Line.IsVisible = true;
@@ -144,7 +161,9 @@ namespace EDSApp
 				System.Drawing.Color color = Colors[1];
 				PointPairList points = new PointPairList();
 				foreach (KeyValuePair<DateTime, double> de in DataRun) {
-					points.Add(new PointPair(new XDate(de.Key), de.Value));
+					if (Data.ContainsKey(de.Key)) {
+						points.Add(new PointPair(new XDate(de.Key), de.Value));
+					}
 
 				}
 				LineItem line = chart.GraphPane.AddCurve(String.Format("Работа ГГ"), points, color, SymbolType.Circle);
@@ -210,36 +229,69 @@ namespace EDSApp
 
 				PointPairList pointsRun = new PointPairList();
 				PointPairList pointsStop = new PointPairList();
+				Dictionary<DateTime, double> RunForApprox = new Dictionary<DateTime, double>();
+				Dictionary<DateTime, double> StopForApprox = new Dictionary<DateTime, double>();
 
 				Data = report.ReadSvod(obj, t, t + step);
 				foreach (KeyValuePair<DateTime, SvodDataRecord> de in Data) {
 					if (de.Value.PAvg < 1) {
-						if (gp)
+						if (gp) {
 							pointsStop.Add(new PointPair(new XDate(de.Key), de.Value.GPLevel));
-						else
+							StopForApprox.Add(de.Key, de.Value.GPLevel);
+						} else {
 							pointsStop.Add(new PointPair(new XDate(de.Key), de.Value.PPLevel));
+							StopForApprox.Add(de.Key, de.Value.PPLevel);
+						}
 					} else {
-						if (gp)
+						if (gp) {
 							pointsRun.Add(new PointPair(new XDate(de.Key), de.Value.GPLevel));
-						else
+							RunForApprox.Add(de.Key, de.Value.GPLevel);
+						} else {
 							pointsRun.Add(new PointPair(new XDate(de.Key), de.Value.PPLevel));
+							RunForApprox.Add(de.Key, de.Value.PPLevel);
+						}
 					}
 				}
 				System.Drawing.Color color = Colors[ind++ % 7];
 				if (pointsRun.Count > 5) {
-					LineItem line = chart.GraphPane.AddCurve(headerRun, pointsRun, color, SymbolType.Diamond);
+					LineItem line = chart.GraphPane.AddCurve("", pointsRun, color, SymbolType.Diamond);
 					line.Line.IsVisible = false;
-					line.Symbol.Size = 2;
+					line.Symbol.Size = 1.5f;
 					line.Symbol.Fill = new Fill(color);
+					
+					pointsRun = new PointPairList();
+					Dictionary<DateTime, double> appr = report.Approx(RunForApprox);
+					foreach (KeyValuePair<DateTime, double> de in appr) {
+						pointsRun.Add(new PointPair(new XDate(de.Key), de.Value));
+					}
+					LineItem ln = chart.GraphPane.AddCurve(headerRun, pointsRun, color, SymbolType.None);
+					ln.Line.IsVisible = true;
+					ln.Line.Style = System.Drawing.Drawing2D.DashStyle.Dash;
+
 				}
 				//line.Line.IsVisible = false;
 				if (pointsStop.Count > 5) {
-					LineItem line = chart.GraphPane.AddCurve(headerStop, pointsStop, color, SymbolType.Circle);
+					LineItem line = chart.GraphPane.AddCurve("", pointsStop, color, SymbolType.Circle);
 					line.Line.IsVisible = false;
-					line.Symbol.Size = 2;
+					line.Symbol.Size = 1.5f;
 					line.Symbol.Fill = new Fill(color);
 
+					pointsStop = new PointPairList();
+					Dictionary<DateTime, double> appr = report.Approx(StopForApprox);
+					foreach (KeyValuePair<DateTime, double> de in appr) {
+						pointsStop.Add(new PointPair(new XDate(de.Key), de.Value));
+					}
+					LineItem ln = chart.GraphPane.AddCurve(headerStop, pointsStop, color, SymbolType.None);
+					ln.Line.IsVisible = true;
+					ln.Line.Style = System.Drawing.Drawing2D.DashStyle.Dash;
 				}
+
+				
+				
+				
+
+
+
 				//line.Line.IsVisible = false;
 			}
 			chart.AxisChange();
