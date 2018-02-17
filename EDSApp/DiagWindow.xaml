@@ -34,22 +34,18 @@
                         </Border>
                         <Border Grid.Row="1">
                             <TabControl Grid.Row="1">
+
                                 <TabItem Header="Длительность работы">
-                                    <WindowsFormsHost>
-                                        <zd:ZedGraphControl x:Name="z1"/>
-                                    </WindowsFormsHost>
+                                    <local:ChartZedControl x:Name="DNTimeWork"/>
                                 </TabItem>
                                 <TabItem Header="Работа в сутки">
-                                    <WindowsFormsHost>
-                                        <zd:ZedGraphControl x:Name="z2"/>
-                                    </WindowsFormsHost>
+                                    <local:ChartZedControl x:Name="DNTimeDay"/>
                                 </TabItem>
                                 <TabItem Header="Пусков в сутки">
-                                    <WindowsFormsHost>
-                                        <zd:ZedGraphControl x:Name="z3"/>
-                                    </WindowsFormsHost>
+                                    <local:ChartZedControl x:Name="DNPuskDay"/>
                                 </TabItem>
                             </TabControl>
+
                         </Border>
                     </Grid>
                 </TabItem>
@@ -70,29 +66,19 @@
                         <Border Grid.Row="1">
                             <TabControl Grid.Row="1">
                                 <TabItem Header="Длительность работы">
-                                    <WindowsFormsHost>
-                                        <zd:ZedGraphControl x:Name="z4"/>
-                                    </WindowsFormsHost>
+                                    <local:ChartZedControl x:Name="MNUTimeWork"/>
                                 </TabItem>
                                 <TabItem Header="Работа в сутки">
-                                    <WindowsFormsHost>
-                                        <zd:ZedGraphControl x:Name="z5"/>
-                                    </WindowsFormsHost>
+                                    <local:ChartZedControl x:Name="MNUTimeDay"/>
                                 </TabItem>
                                 <TabItem Header="Пусков в сутки">
-                                    <WindowsFormsHost>
-                                        <zd:ZedGraphControl x:Name="z6"/>
-                                    </WindowsFormsHost>
+                                    <local:ChartZedControl x:Name="MNUPuskDay"/>
                                 </TabItem>
                                 <TabItem Header="ЛН Работа в сутки">
-                                    <WindowsFormsHost>
-                                        <zd:ZedGraphControl x:Name="z51"/>
-                                    </WindowsFormsHost>
+                                    <local:ChartZedControl x:Name="LNTimeDay"/>
                                 </TabItem>
                                 <TabItem Header="ЛН Пусков в сутки">
-                                    <WindowsFormsHost>
-                                        <zd:ZedGraphControl x:Name="z61"/>
-                                    </WindowsFormsHost>
+                                    <local:ChartZedControl x:Name="LNPuskDay"/>
                                 </TabItem>
                             </TabControl>
                         </Border>
@@ -116,14 +102,10 @@
                         <Border Grid.Row="1">
                             <TabControl Grid.Row="1">
                                 <TabItem Header="ГП">
-                                    <WindowsFormsHost>
-                                        <zd:ZedGraphControl x:Name="z7"/>
-                                    </WindowsFormsHost>
+                                    <local:ChartZedControl x:Name="GPLevel"/>
                                 </TabItem>
                                 <TabItem Header="ПП">
-                                    <WindowsFormsHost>
-                                        <zd:ZedGraphControl x:Name="z8"/>
-                                    </WindowsFormsHost>
+                                    <local:ChartZedControl x:Name="PPLevel"/>
                                 </TabItem>
 
                             </TabControl>

@@ -26,7 +26,7 @@ namespace EDSApp
 			InitializeComponent();
 			clndFrom.SelectedDate = DateTime.Now.Date.AddMonths(-3);
 			clndTo.SelectedDate = DateTime.Now.Date;
-			Colors = new List<System.Drawing.Color>();			
+			Colors = new List<System.Drawing.Color>();
 			Colors.Add(System.Drawing.Color.Red);
 			Colors.Add(System.Drawing.Color.Green);
 			Colors.Add(System.Drawing.Color.Blue);
@@ -34,7 +34,7 @@ namespace EDSApp
 			Colors.Add(System.Drawing.Color.YellowGreen);
 			Colors.Add(System.Drawing.Color.Pink);
 			Colors.Add(System.Drawing.Color.Orange);
-			Colors.Add(System.Drawing.Color.Gray);			
+			Colors.Add(System.Drawing.Color.Gray);
 		}
 
 		private void btnCreate_Click(object sender, RoutedEventArgs e) {
@@ -43,13 +43,14 @@ namespace EDSApp
 
 		private void drenClick_Click(object sender, RoutedEventArgs e) {
 			int splitPower = Int32.Parse(txtDNSplitPower.Text);
-			createPumpRunChart(z1, PumpTypeEnum.Drenage, chbDNSplitPower.IsChecked.Value, splitPower);
 			PumpDiagnostics report = new PumpDiagnostics(clndFrom.SelectedDate.Value, clndTo.SelectedDate.Value);
 			Dictionary<DateTime, SvodDataRecord> Data = report.ReadPumpSvod("P_Avg", -1, 200);
 			Dictionary<DateTime, double> DataRun = report.ReadGGRun();
-			createPumpPuskChart(z2, PumpTypeEnum.Drenage,Data,DataRun, true);
-			createPumpPuskChart(z3, PumpTypeEnum.Drenage, Data,DataRun,  false);
 
+
+			createPumpRunChart(DNTimeWork, PumpTypeEnum.Drenage, chbDNSplitPower.IsChecked.Value, splitPower);
+			createPumpPuskChart(DNTimeDay, PumpTypeEnum.Drenage, Data, DataRun, true);
+			createPumpPuskChart(DNPuskDay, PumpTypeEnum.Drenage, Data, DataRun, false);
 		}
 
 		public void prepareChart(ZedGraphControl chart) {
@@ -59,21 +60,24 @@ namespace EDSApp
 			chart.GraphPane.XAxis.Title.IsVisible = false;
 			chart.GraphPane.YAxis.Title.IsVisible = true;
 			chart.GraphPane.YAxis.Title.FontSpec.Size = 10;
-			chart.GraphPane.Title.IsVisible = false;			
+			chart.GraphPane.Title.IsVisible = false;
 		}
 
-		public void createPumpRunChart(ZedGraphControl chart, PumpTypeEnum type, bool split, int splitPower) {
+
+		
+
+		public void createPumpRunChart(ChartZedControl chart, PumpTypeEnum type, bool split, int splitPower) {
 			int ind = 0;
 			PumpDiagnostics report = new PumpDiagnostics(clndFrom.SelectedDate.Value, clndTo.SelectedDate.Value);
 			Dictionary<DateTime, PumpDataRecord> Data = new Dictionary<DateTime, PumpDataRecord>();
 
-			prepareChart(chart);
+			chart.init();
 
 			List<int> powers = new List<int>();
 			if (split) {
 				powers.Add(-1);
 				int power = 35;
-				while (power  <= 115) {
+				while (power <= 115) {
 					powers.Add(power);
 					power += splitPower;
 				}
@@ -96,44 +100,37 @@ namespace EDSApp
 					}
 				}
 
-				
-				if (Data.Count > 0) {
-					Dictionary<DateTime, double> DataForApprox = new Dictionary<DateTime, double>();
+
+				if (Data.Count > 10) {
+
 					System.Drawing.Color color = Colors[ind++ % 7];
-					PointPairList points = new PointPairList();
+
+					Dictionary<DateTime, double> data = new Dictionary<DateTime, double>();
 					foreach (KeyValuePair<DateTime, PumpDataRecord> de in Data) {
-						points.Add(new PointPair(new XDate(de.Key), de.Value.RunTime));
-						DataForApprox.Add(de.Key, de.Value.RunTime);
-					}
-					LineItem line = chart.GraphPane.AddCurve("", points, color, SymbolType.Circle);
-					line.Line.IsVisible = false;
-					line.Symbol.Fill = new Fill(color);
-					line.Symbol.Size = 1.5F;					
-
-					Dictionary<DateTime, double> appr = report.Approx(DataForApprox);
-					points = new PointPairList();
-					foreach (KeyValuePair<DateTime, double> de in appr) {
-						points.Add(new PointPair(new XDate(de.Key), de.Value));
+						data.Add(de.Key, de.Value.RunTime);
 					}
 
-					line = chart.GraphPane.AddCurve(header, points, color, SymbolType.None);
-					line.Line.IsVisible = true;
-					line.Line.Style = System.Drawing.Drawing2D.DashStyle.Dash;
+					chart.AddSerie(header, data, color, false, true);
 
+					Dictionary<DateTime, double> appr = report.Approx(data);
+
+					chart.AddSerie(header, appr, color, true, false);
 				}
 			}
-			chart.AxisChange();
-			chart.Invalidate();
 		}
 
-		public void createPumpPuskChart(ZedGraphControl chart, PumpTypeEnum type, Dictionary<DateTime, SvodDataRecord> Data, Dictionary<DateTime,double> DataRun, bool time) {
+
+
+		
+
+		public void createPumpPuskChart(ChartZedControl chart, PumpTypeEnum type, Dictionary<DateTime, SvodDataRecord> Data, Dictionary<DateTime, double> DataRun, bool time) {
 			int ind = 0;
-			prepareChart(chart);
+			chart.init();
 			List<int> powers = new List<int>();
 
 			if (Data.Count > 0) {
+				Dictionary<DateTime, double> data = new Dictionary<DateTime, double>();
 				System.Drawing.Color color = Colors[0];
-				PointPairList points = new PointPairList();
 				foreach (KeyValuePair<DateTime, SvodDataRecord> de in Data) {
 					double val = 0;
 					switch (type) {
@@ -147,55 +144,40 @@ namespace EDSApp
 							val = time ? de.Value.MNU1Time + de.Value.MNU2Time + de.Value.MNU3Time : de.Value.MNU1Pusk + de.Value.MNU2Pusk + de.Value.MNU3Pusk;
 							break;
 					}
-					points.Add(new PointPair(new XDate(de.Key), val));
+					data.Add(de.Key, val);
 
 
 				}
-				LineItem line = chart.GraphPane.AddCurve(String.Format("{0}", time ? "Работа (ceк)" : "Пусков"), points, color, SymbolType.Circle);
-				line.Line.IsVisible = true;
-				line.Symbol.Size = 1;
-				line.Symbol.Fill = new Fill(color);
+				chart.AddSerie(String.Format("{0}", time ? "Работа (ceк)" : "Пусков"), data, color, true, true);
+
 			}
 
 			if (DataRun.Count > 0) {
 				System.Drawing.Color color = Colors[1];
-				PointPairList points = new PointPairList();
-				foreach (KeyValuePair<DateTime, double> de in DataRun) {
-					if (Data.ContainsKey(de.Key)) {
-						points.Add(new PointPair(new XDate(de.Key), de.Value));
-					}
+				chart.AddSerie(String.Format("Работа ГГ"), DataRun, color, true, true);
 
-				}
-				LineItem line = chart.GraphPane.AddCurve(String.Format("Работа ГГ"), points, color, SymbolType.Circle);
-				line.Line.IsVisible = true;
-				line.Symbol.Size = 1;
-				line.Symbol.Fill = new Fill(color);
-				//chart.GraphPane.YAxisList.Add("ГГ");
-				line.IsY2Axis = true;
 			}
 
-			chart.AxisChange();
-			chart.Invalidate();
 		}
 
 		private void mnuClick_Click(object sender, RoutedEventArgs e) {
 			int splitPower = Int32.Parse(txtMNUSplitPower.Text);
-			createPumpRunChart(z4, PumpTypeEnum.MNU, chbMNUSplitPower.IsChecked.Value, splitPower);
+			createPumpRunChart(MNUTimeWork, PumpTypeEnum.MNU, chbMNUSplitPower.IsChecked.Value, splitPower);
 			PumpDiagnostics report = new PumpDiagnostics(clndFrom.SelectedDate.Value, clndTo.SelectedDate.Value);
 			Dictionary<DateTime, SvodDataRecord> Data = report.ReadPumpSvod("P_Avg", -1, 200);
 			Dictionary<DateTime, double> DataRun = report.ReadGGRun();
-			createPumpPuskChart(z5, PumpTypeEnum.MNU,Data,DataRun, true);
-			createPumpPuskChart(z6, PumpTypeEnum.MNU, Data,DataRun, false);
-			createPumpPuskChart(z51, PumpTypeEnum.Leakage, Data,DataRun, true);
-			createPumpPuskChart(z61, PumpTypeEnum.Leakage, Data,DataRun, false);
+			createPumpPuskChart(MNUTimeDay, PumpTypeEnum.MNU, Data, DataRun, true);
+			createPumpPuskChart(MNUPuskDay, PumpTypeEnum.MNU, Data, DataRun, false);
+			createPumpPuskChart(LNTimeDay, PumpTypeEnum.Leakage, Data, DataRun, true);
+			createPumpPuskChart(LNPuskDay, PumpTypeEnum.Leakage, Data, DataRun, false);
 		}
 
-		public void createOilChart(ZedGraphControl chart, bool gp, bool splitHot, bool splitCold, double step) {
+		public void createOilChart(ChartZedControl chart, bool gp, bool splitHot, bool splitCold, double step) {
 			int ind = 0;
 			PumpDiagnostics report = new PumpDiagnostics(clndFrom.SelectedDate.Value, clndTo.SelectedDate.Value);
 			Dictionary<DateTime, SvodDataRecord> Data = new Dictionary<DateTime, SvodDataRecord>();
 
-			prepareChart(chart);
+			chart.init();
 
 			string obj = gp ? "GP_" : "PP_";
 			string temp = splitHot ? "Hot" : "Cold";
@@ -227,83 +209,55 @@ namespace EDSApp
 					header = String.Format("Уровень при t {0:0.0}-{1:0.0}", t, t + step);
 				}
 
-				PointPairList pointsRun = new PointPairList();
-				PointPairList pointsStop = new PointPairList();
+
 				Dictionary<DateTime, double> RunForApprox = new Dictionary<DateTime, double>();
 				Dictionary<DateTime, double> StopForApprox = new Dictionary<DateTime, double>();
 
 				Data = report.ReadSvod(obj, t, t + step);
 				foreach (KeyValuePair<DateTime, SvodDataRecord> de in Data) {
-					if (de.Value.PAvg < 1) {
+					if (de.Value.PAvg ==0) {
 						if (gp) {
-							pointsStop.Add(new PointPair(new XDate(de.Key), de.Value.GPLevel));
 							StopForApprox.Add(de.Key, de.Value.GPLevel);
 						} else {
-							pointsStop.Add(new PointPair(new XDate(de.Key), de.Value.PPLevel));
 							StopForApprox.Add(de.Key, de.Value.PPLevel);
 						}
 					} else {
 						if (gp) {
-							pointsRun.Add(new PointPair(new XDate(de.Key), de.Value.GPLevel));
 							RunForApprox.Add(de.Key, de.Value.GPLevel);
 						} else {
-							pointsRun.Add(new PointPair(new XDate(de.Key), de.Value.PPLevel));
 							RunForApprox.Add(de.Key, de.Value.PPLevel);
 						}
 					}
 				}
 				System.Drawing.Color color = Colors[ind++ % 7];
-				if (pointsRun.Count > 5) {
-					LineItem line = chart.GraphPane.AddCurve("", pointsRun, color, SymbolType.Diamond);
-					line.Line.IsVisible = false;
-					line.Symbol.Size = 1.5f;
-					line.Symbol.Fill = new Fill(color);
+				if (RunForApprox.Count > 10) {
+					chart.AddSerie(headerRun, RunForApprox, color, false, true);
 					
-					pointsRun = new PointPairList();
 					Dictionary<DateTime, double> appr = report.Approx(RunForApprox);
-					foreach (KeyValuePair<DateTime, double> de in appr) {
-						pointsRun.Add(new PointPair(new XDate(de.Key), de.Value));
-					}
-					LineItem ln = chart.GraphPane.AddCurve(headerRun, pointsRun, color, SymbolType.None);
-					ln.Line.IsVisible = true;
-					ln.Line.Style = System.Drawing.Drawing2D.DashStyle.Dash;
+					chart.AddSerie(headerRun, appr, color, true, false);					
 
 				}
 				//line.Line.IsVisible = false;
-				if (pointsStop.Count > 5) {
-					LineItem line = chart.GraphPane.AddCurve("", pointsStop, color, SymbolType.Circle);
-					line.Line.IsVisible = false;
-					line.Symbol.Size = 1.5f;
-					line.Symbol.Fill = new Fill(color);
+				if (StopForApprox.Count > 10) {
+					chart.AddSerie(headerStop, StopForApprox, color, false, true);
 
-					pointsStop = new PointPairList();
 					Dictionary<DateTime, double> appr = report.Approx(StopForApprox);
-					foreach (KeyValuePair<DateTime, double> de in appr) {
-						pointsStop.Add(new PointPair(new XDate(de.Key), de.Value));
-					}
-					LineItem ln = chart.GraphPane.AddCurve(headerStop, pointsStop, color, SymbolType.None);
-					ln.Line.IsVisible = true;
-					ln.Line.Style = System.Drawing.Drawing2D.DashStyle.Dash;
+					chart.AddSerie(headerStop, appr, color, true, false);
+					
 				}
-
-				
-				
-				
-
 
 
 				//line.Line.IsVisible = false;
 			}
-			chart.AxisChange();
-			chart.Invalidate();
+
 		}
 
 		private void oilClick_Click(object sender, RoutedEventArgs e) {
 			bool splitHot = chbOilSplitHot.IsChecked.Value;
 			bool splitCold = chbOilSplitCold.IsChecked.Value;
 			double step = Double.Parse(txtOilSplitTemp.Text);
-			createOilChart(z7, true, splitHot, splitCold, step);
-			createOilChart(z8, false, splitHot, splitCold, step);
+			createOilChart(GPLevel, true, splitHot, splitCold, step);
+			createOilChart(PPLevel, false, splitHot, splitCold, step);
 		}
 
 

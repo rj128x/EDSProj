@@ -13,7 +13,12 @@ namespace EDSProj.Diagnostics
 		public static SqlConnection getConnection() {
 			String str = String.Format("Data Source={0};Initial Catalog={1};Persist Security Info=True;User ID={2};Password={3};Trusted_Connection=False;",
 				Settings.Single.DiadDBServer, Settings.Single.DiagDBName, Settings.Single.DiagDBUser, Settings.Single.DiagDBPassword);
-			return new SqlConnection(str);
+			SqlConnection con=new SqlConnection(str);
+			con.Open();
+			SqlCommand com = con.CreateCommand();
+			com.CommandText = "SET DATEFORMAT ymd";
+			com.ExecuteNonQuery();
+			return con;
 		}
 
 		public string FileName { get; set; }

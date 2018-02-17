@@ -77,7 +77,6 @@ namespace EDSProj.Diagnostics
 
 		public Dictionary<DateTime, PumpDataRecord> ReadDataPump(PumpTypeEnum type,int powerStart,int powerStop) {
 			SqlConnection con = ReportOutputFile.getConnection();
-			con.Open();
 
 			string query = String.Format("Select * from pumpTable where dateStart>='{0}' and dateEnd<='{1}' and isUst=1 and pAvg>={2} and pAvg<={3} and PumpType='{4}' order by dateStart",
 				StartDate.ToString(DateFormat), EndDate.ToString(DateFormat), powerStart, powerStop,type.ToString());
@@ -89,6 +88,7 @@ namespace EDSProj.Diagnostics
 			SqlDataReader reader = com.ExecuteReader();
 			while (reader.Read()) {
 				PumpDataRecord rec = new PumpDataRecord();
+				
 				rec.DateStart = reader.GetDateTime(reader.GetOrdinal("DateStart"));
 				rec.DateEnd = reader.GetDateTime(reader.GetOrdinal("DateEnd"));
 				rec.IsUst = reader.GetBoolean(reader.GetOrdinal("IsUst"));
@@ -109,7 +109,6 @@ namespace EDSProj.Diagnostics
 
 		public Dictionary<DateTime, SvodDataRecord> ReadSvod(string groupName,double start,double stop) {
 			SqlConnection con = ReportOutputFile.getConnection();
-			con.Open();
 			string query = String.Format("Select * from svodTable where dateStart>='{0}' and dateEnd<='{1}' and isUst=1 and {2}>={3} and {2}<={4} order by dateStart",
 				StartDate.ToString(DateFormat), EndDate.ToString(DateFormat), groupName, start.ToString().Replace(",","."), stop.ToString().Replace(",", "."));
 
@@ -157,7 +156,6 @@ namespace EDSProj.Diagnostics
 
 		public Dictionary<DateTime, SvodDataRecord> ReadPumpSvod(string groupName, double start, double stop) {
 			SqlConnection con = ReportOutputFile.getConnection();
-			con.Open();
 			string query = String.Format(
 @"select  
 	format(datestart, 'dd.MM.yyyy') as dt,
@@ -216,7 +214,6 @@ order by mindate",
 
 		public Dictionary<DateTime, double> ReadGGRun() {
 			SqlConnection con = ReportOutputFile.getConnection();
-			con.Open();
 			string query = String.Format(
 @"select  
 	format(datestart, 'dd.MM.yyyy') as dt,
