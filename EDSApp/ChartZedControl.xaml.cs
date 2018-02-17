@@ -95,6 +95,19 @@ namespace EDSApp
 
 		}
 
+		public void refreshDates() {
+			DateTime min = DateTime.MaxValue;
+			DateTime max = DateTime.MinValue;
+			foreach (ChartZedSerie ser in ObsSeries) {
+				DateTime minD = ser.Data.Keys.Min();
+				DateTime maxD = ser.Data.Keys.Max();
+				min = min > minD ? minD:min;
+				max = max < maxD ? maxD : max;
+			}
+			chart.GraphPane.XAxis.Scale.Min = XDate.DateTimeToXLDate(min);
+			chart.GraphPane.XAxis.Scale.Max = XDate.DateTimeToXLDate(max);
+		}
+
 		public void AddSerie(String header, Dictionary<DateTime, double> values, System.Drawing.Color color, bool line, bool symbol) {
 			PointPairList points = new PointPairList();
 			foreach (KeyValuePair<DateTime, double> de in values) {
@@ -115,7 +128,7 @@ namespace EDSApp
 			}
 			ObsSeries.Add(serie);
 
-
+			refreshDates();
 			chart.AxisChange();
 			chart.Invalidate();
 		}

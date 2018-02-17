@@ -52,10 +52,10 @@ namespace EDSApp
 			chart.GraphPane.YAxis.Title.IsVisible = true;
 			chart.GraphPane.YAxis.Title.FontSpec.Size = 10;
 			chart.GraphPane.Title.IsVisible = false;
+
 		}
 
 
-		
 
 		public void createPumpRunChart(ChartZedControl chart, PumpTypeEnum type, bool split, int splitPower) {
 			int ind = 0;
