@@ -16,8 +16,16 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Border Grid.Column="0">
-                <Grid>
-                    <DataGrid Name="grdLegend" AutoGenerateColumns="False" CanUserResizeRows="False" CanUserResizeColumns="False" CanUserAddRows="False">
+                <Grid >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="20"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Orientation="Horizontal" Grid.Column="0">
+                        <Button Content="Выделить все" Name="btnSelectAll" Width="90" Click="btnSelectAll_Click"/>
+                        <Button Content="Снять все" Name="btnDeselectAll" Width="90" Click="btnDeselectAll_Click"/>
+                    </StackPanel>
+                    <DataGrid Grid.Row="1" Name="grdLegend" AutoGenerateColumns="False" CanUserResizeRows="False" CanUserResizeColumns="False" CanUserAddRows="False">
                         <DataGrid.Columns>
                             <DataGridTemplateColumn Header="V" Width="20">
                                 <DataGridTemplateColumn.CellTemplate>

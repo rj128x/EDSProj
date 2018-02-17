@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,8 +18,14 @@ using ZedGraph;
 
 namespace EDSApp
 {
-	public class ChartZedSerie
+	public class ChartZedSerie : INotifyPropertyChanged
 	{
+		public event PropertyChangedEventHandler PropertyChanged;
+		public void NotifyChanged(string propName) {
+			if (PropertyChanged != null)
+				PropertyChanged(this, new PropertyChangedEventArgs(propName));
+		}
+
 		public static List<System.Drawing.Color> Colors;
 		static ChartZedSerie() {
 			Colors = new List<System.Drawing.Color>();
@@ -31,10 +38,24 @@ namespace EDSApp
 			Colors.Add(System.Drawing.Color.Orange);
 			Colors.Add(System.Drawing.Color.Gray);
 		}
+		public static int indexColor = 0;
+
+		public static System.Drawing.Color NextColor() {
+			return Colors[indexColor++ % Colors.Count];
+		}
 		public string Header { get; set; }
 		public LineItem Item { get; set; }
-		public bool IsVisible { get; set; }
+
+		private bool _isVisible;
+		public bool IsVisible {
+			get => _isVisible; set {
+				_isVisible = value;
+				NotifyChanged("IsVisible");
+			}
+		}
 		protected System.Drawing.Color _color;
+		
+
 		public System.Drawing.Color Color {
 			get {
 				return _color;
@@ -69,14 +90,14 @@ namespace EDSApp
 			chart.GraphPane.YAxis.Title.IsVisible = true;
 			chart.GraphPane.YAxis.Title.FontSpec.Size = 10;
 			chart.GraphPane.Title.IsVisible = false;
-			chart.GraphPane.Legend.IsVisible = true;
-
+			chart.GraphPane.Legend.IsVisible = false;
+			ChartZedSerie.indexColor = 0;
 
 		}
 
-		public void AddSerie(String header,Dictionary<DateTime,double> values, System.Drawing.Color color,bool line,bool symbol) {
+		public void AddSerie(String header, Dictionary<DateTime, double> values, System.Drawing.Color color, bool line, bool symbol) {
 			PointPairList points = new PointPairList();
-			foreach (KeyValuePair<DateTime,double> de in values) {
+			foreach (KeyValuePair<DateTime, double> de in values) {
 				points.Add(new PointPair(new XDate(de.Key), de.Value));
 			}
 			ChartZedSerie serie = new ChartZedSerie();
@@ -84,7 +105,7 @@ namespace EDSApp
 			serie.Data = values;
 			serie.Color = color;
 			serie.IsVisible = true;
-			LineItem lineItem=chart.GraphPane.AddCurve(header, points, color, symbol ? SymbolType.Circle : SymbolType.None);
+			LineItem lineItem = chart.GraphPane.AddCurve(header, points, color, symbol ? SymbolType.Circle : SymbolType.None);
 			serie.Item = lineItem;
 
 			lineItem.Line.IsVisible = line;
@@ -93,7 +114,7 @@ namespace EDSApp
 				lineItem.Symbol.Fill = new Fill(color);
 			}
 			ObsSeries.Add(serie);
-			
+
 
 			chart.AxisChange();
 			chart.Invalidate();
@@ -110,6 +131,23 @@ namespace EDSApp
 				chart.AxisChange();
 				chart.Invalidate();
 			} catch { }
+		}
+
+		private void SetAll(bool visible) {
+			foreach (ChartZedSerie ser in ObsSeries) {
+				ser.Item.IsVisible = visible;
+				ser.IsVisible = visible;
+				chart.AxisChange();
+				chart.Invalidate();
+			}
+		}
+
+		private void btnSelectAll_Click(object sender, RoutedEventArgs e) {
+			SetAll(true);
+		}
+
+		private void btnDeselectAll_Click(object sender, RoutedEventArgs e) {
+			SetAll(false);
 		}
 	}
 }

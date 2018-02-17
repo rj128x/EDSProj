@@ -21,20 +21,11 @@ namespace EDSApp
 	/// </summary>
 	public partial class DiagWindow : Window
 	{
-		public List<System.Drawing.Color> Colors;
 		public DiagWindow() {
 			InitializeComponent();
 			clndFrom.SelectedDate = DateTime.Now.Date.AddMonths(-3);
 			clndTo.SelectedDate = DateTime.Now.Date;
-			Colors = new List<System.Drawing.Color>();
-			Colors.Add(System.Drawing.Color.Red);
-			Colors.Add(System.Drawing.Color.Green);
-			Colors.Add(System.Drawing.Color.Blue);
-			Colors.Add(System.Drawing.Color.Purple);
-			Colors.Add(System.Drawing.Color.YellowGreen);
-			Colors.Add(System.Drawing.Color.Pink);
-			Colors.Add(System.Drawing.Color.Orange);
-			Colors.Add(System.Drawing.Color.Gray);
+
 		}
 
 		private void btnCreate_Click(object sender, RoutedEventArgs e) {
@@ -103,7 +94,7 @@ namespace EDSApp
 
 				if (Data.Count > 10) {
 
-					System.Drawing.Color color = Colors[ind++ % 7];
+					System.Drawing.Color color = ChartZedSerie.NextColor();
 
 					Dictionary<DateTime, double> data = new Dictionary<DateTime, double>();
 					foreach (KeyValuePair<DateTime, PumpDataRecord> de in Data) {
@@ -130,7 +121,7 @@ namespace EDSApp
 
 			if (Data.Count > 0) {
 				Dictionary<DateTime, double> data = new Dictionary<DateTime, double>();
-				System.Drawing.Color color = Colors[0];
+				System.Drawing.Color color = ChartZedSerie.NextColor();
 				foreach (KeyValuePair<DateTime, SvodDataRecord> de in Data) {
 					double val = 0;
 					switch (type) {
@@ -153,7 +144,7 @@ namespace EDSApp
 			}
 
 			if (DataRun.Count > 0) {
-				System.Drawing.Color color = Colors[1];
+				System.Drawing.Color color = ChartZedSerie.NextColor();
 				chart.AddSerie(String.Format("Работа ГГ"), DataRun, color, true, true);
 
 			}
@@ -229,7 +220,7 @@ namespace EDSApp
 						}
 					}
 				}
-				System.Drawing.Color color = Colors[ind++ % 7];
+				System.Drawing.Color color = ChartZedSerie.NextColor();
 				if (RunForApprox.Count > 10) {
 					chart.AddSerie(headerRun, RunForApprox, color, false, true);
 					
