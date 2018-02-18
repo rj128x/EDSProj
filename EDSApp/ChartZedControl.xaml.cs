@@ -54,7 +54,7 @@ namespace EDSApp
 			}
 		}
 		protected System.Drawing.Color _color;
-		
+
 
 		public System.Drawing.Color Color {
 			get {
@@ -72,10 +72,21 @@ namespace EDSApp
 	/// <summary>
 	/// Логика взаимодействия для ChartZedControl.xaml
 	/// </summary>
-	public partial class ChartZedControl : UserControl
+	public partial class ChartZedControl : UserControl, INotifyPropertyChanged
 	{
+		public event PropertyChangedEventHandler PropertyChanged;
+		public void NotifyChanged(string propName) {
+			if (PropertyChanged != null)
+				PropertyChanged(this, new PropertyChangedEventArgs(propName));
+		}
+
 		public ObservableCollection<ChartZedSerie> ObsSeries;
 		public Dictionary<string, ChartZedSerie> Series;
+		private DateTime _minDate;
+		private DateTime _maxDate;
+
+		public DateTime MinDate { get => _minDate; set { _minDate = value; NotifyChanged("MinDate"); } }
+		public DateTime MaxDate { get => _maxDate; set { _maxDate = value; NotifyChanged("MinDate"); } }
 		public ChartZedControl() {
 			ObsSeries = new ObservableCollection<ChartZedSerie>();
 			InitializeComponent();
@@ -91,9 +102,11 @@ namespace EDSApp
 			chart.GraphPane.YAxis.Title.FontSpec.Size = 10;
 			chart.GraphPane.Title.IsVisible = false;
 			chart.GraphPane.Legend.IsVisible = false;
+			chart.IsZoomOnMouseCenter = false;
 			ChartZedSerie.indexColor = 0;
 
 		}
+
 
 		public void refreshDates() {
 			DateTime min = DateTime.MaxValue;
@@ -101,14 +114,14 @@ namespace EDSApp
 			foreach (ChartZedSerie ser in ObsSeries) {
 				DateTime minD = ser.Data.Keys.Min();
 				DateTime maxD = ser.Data.Keys.Max();
-				min = min > minD ? minD:min;
+				min = min > minD ? minD : min;
 				max = max < maxD ? maxD : max;
 			}
 			chart.GraphPane.XAxis.Scale.Min = XDate.DateTimeToXLDate(min);
 			chart.GraphPane.XAxis.Scale.Max = XDate.DateTimeToXLDate(max);
 		}
 
-		public void AddSerie(String header, Dictionary<DateTime, double> values, System.Drawing.Color color, bool line, bool symbol) {
+		public void AddSerie(String header, Dictionary<DateTime, double> values, System.Drawing.Color color, bool line, bool symbol,int y2axisIndex=-1) {
 			PointPairList points = new PointPairList();
 			foreach (KeyValuePair<DateTime, double> de in values) {
 				points.Add(new PointPair(new XDate(de.Key), de.Value));
@@ -128,9 +141,17 @@ namespace EDSApp
 			}
 			ObsSeries.Add(serie);
 
+			if (y2axisIndex > -1) {
+				while (chart.GraphPane.Y2AxisList.Count()< y2axisIndex + 1) {
+					chart.GraphPane.Y2AxisList.Add(new Y2Axis());
+				}
+				lineItem.IsY2Axis = true;
+				lineItem.YAxisIndex = y2axisIndex;
+			}
 			refreshDates();
 			chart.AxisChange();
 			chart.Invalidate();
+
 		}
 
 

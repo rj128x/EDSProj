@@ -139,7 +139,7 @@ namespace EDSApp
 
 
 				}
-				chart.AddSerie(String.Format("{0}", time ? "Работа (ceк)" : "Пусков"), data, color, true, true);
+				chart.AddSerie(String.Format("{0}", time ? "Работа (ceк)" : "Пусков"), data, color, true, true,0);
 
 			}
 
