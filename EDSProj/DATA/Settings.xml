@@ -25,7 +25,7 @@
   <FTPAOUser>AO_USER</FTPAOUser> <!--Пользователь FTP-->
   <FTPAOPassword>Ovation1</FTPAOPassword> <!--Пароль FTP-->
 
-  <DiadDBServer>rj128x-pc\sqlexpress</DiadDBServer>
+  <DiadDBServer>sr-votges-015\sqlexpress</DiadDBServer>
   <DiagDBPassword>psWD!159!</DiagDBPassword>
   <DiagDBUser>sa</DiagDBUser>
   <DiagDBName>Diagnostics</DiagDBName>

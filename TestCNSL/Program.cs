@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace TestCNSL
@@ -14,12 +15,20 @@ namespace TestCNSL
 			Settings.init("Data/Settings.xml");
 			Logger.InitFileLogger(Settings.Single.LogPath, "pbrExport");
 
-			DateTime date = DateTime.Parse("13.02.2018");
+			DateTime date = DateTime.Now.Date;
 			if (args.Length == 1) {
 				int day = Int32.Parse(args[0]);
 				runReports(date.AddDays(-day));
 			}
-			
+			if (args.Length == 2) {
+				int day = Int32.Parse(args[0]);
+				int day2 = Int32.Parse(args[1]);
+				for (int d = day; d <= day2; d++) {
+					runReports(date.AddDays(-d));
+					Thread.Sleep(10000);
+				}
+			}
+
 			//run();
 			//Console.ReadLine();
 		}
@@ -37,7 +46,8 @@ namespace TestCNSL
 				/*Console.WriteLine(report.id);
 				Console.WriteLine(report.reportDefinitionFile);
 				Console.WriteLine(report.inputValues);*/
-				if (report.reportDefinitionFile.Contains("pump")) {
+				string file = report.reportDefinitionFile.ToLower();
+				if (file.Contains("pump_svod")) {
 					idsForRun.Add((int)report.id);
 				}				
 			}

@@ -97,12 +97,15 @@ namespace EDSApp
 			chart.GraphPane.CurveList.Clear();
 			chart.GraphPane.XAxis.Type = AxisType.Date;
 			chart.GraphPane.XAxis.Scale.Format = "dd.MM";
+			chart.GraphPane.YAxis.Scale.Format = "00";
 			chart.GraphPane.XAxis.Title.IsVisible = false;
-			chart.GraphPane.YAxis.Title.IsVisible = true;
-			chart.GraphPane.YAxis.Title.FontSpec.Size = 10;
+			chart.GraphPane.YAxis.Title.Text = "";
+			chart.GraphPane.YAxis.Title.FontSpec.Size = 7;
 			chart.GraphPane.Title.IsVisible = false;
 			chart.GraphPane.Legend.IsVisible = false;
 			chart.IsZoomOnMouseCenter = false;
+			chart.GraphPane.YAxis.Scale.FontSpec.Size = 10;
+			chart.GraphPane.XAxis.Scale.FontSpec.Size = 10;
 			ChartZedSerie.indexColor = 0;
 
 		}
@@ -145,6 +148,10 @@ namespace EDSApp
 				while (chart.GraphPane.Y2AxisList.Count()< y2axisIndex + 1) {
 					chart.GraphPane.Y2AxisList.Add(new Y2Axis());
 				}
+				chart.GraphPane.Y2AxisList[y2axisIndex].IsVisible = true;
+				chart.GraphPane.Y2AxisList[y2axisIndex].Scale.FontSpec.Size = 10;
+				chart.GraphPane.Y2AxisList[y2axisIndex].Title.FontSpec.Size = 7;
+				
 				lineItem.IsY2Axis = true;
 				lineItem.YAxisIndex = y2axisIndex;
 			}

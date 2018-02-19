@@ -112,7 +112,7 @@ namespace EDSApp
 
 
 
-		
+
 
 		public void createPumpPuskChart(ChartZedControl chart, PumpTypeEnum type, Dictionary<DateTime, SvodDataRecord> Data, Dictionary<DateTime, double> DataRun, bool time) {
 			int ind = 0;
@@ -139,7 +139,7 @@ namespace EDSApp
 
 
 				}
-				chart.AddSerie(String.Format("{0}", time ? "Работа (ceк)" : "Пусков"), data, color, true, true,0);
+				chart.AddSerie(String.Format("{0}", time ? "Работа (ceк)" : "Пусков"), data, color, true, true, 0);
 
 			}
 
@@ -173,6 +173,7 @@ namespace EDSApp
 			string obj = gp ? "GP_" : "PP_";
 			string temp = splitHot ? "Hot" : "Cold";
 			obj = obj + temp;
+			string isUstGroup = gp ? "IsUstGP" : "IsUstPP";
 			bool split = splitHot || splitCold;
 
 			List<double> AllTemps = new List<double>();
@@ -190,6 +191,7 @@ namespace EDSApp
 				string headerRun = "";
 				string headerStop = "";
 				string header = "";
+
 				if (!split) {
 					headerRun = "Уровень масла (ГГ в работе)";
 					headerStop = "Уровень масла (ГГ стоит)";
@@ -204,9 +206,11 @@ namespace EDSApp
 				Dictionary<DateTime, double> RunForApprox = new Dictionary<DateTime, double>();
 				Dictionary<DateTime, double> StopForApprox = new Dictionary<DateTime, double>();
 
-				Data = report.ReadSvod(obj, t, t + step);
+
+
+				Data = report.ReadSvod(obj, t, t + step, isUstGroup);
 				foreach (KeyValuePair<DateTime, SvodDataRecord> de in Data) {
-					if (de.Value.PAvg ==0) {
+					if (de.Value.PAvg == 0) {
 						if (gp) {
 							StopForApprox.Add(de.Key, de.Value.GPLevel);
 						} else {
@@ -219,13 +223,14 @@ namespace EDSApp
 							RunForApprox.Add(de.Key, de.Value.PPLevel);
 						}
 					}
+
 				}
 				System.Drawing.Color color = ChartZedSerie.NextColor();
 				if (RunForApprox.Count > 10) {
 					chart.AddSerie(headerRun, RunForApprox, color, false, true);
-					
+
 					Dictionary<DateTime, double> appr = report.Approx(RunForApprox);
-					chart.AddSerie(headerRun, appr, color, true, false);					
+					chart.AddSerie(headerRun, appr, color, true, false);
 
 				}
 				//line.Line.IsVisible = false;
@@ -234,13 +239,28 @@ namespace EDSApp
 
 					Dictionary<DateTime, double> appr = report.Approx(StopForApprox);
 					chart.AddSerie(headerStop, appr, color, true, false);
-					
+
 				}
+
+
 
 
 				//line.Line.IsVisible = false;
 			}
-
+			Dictionary<DateTime, double> DataHot = new Dictionary<DateTime, double>();
+			Dictionary<DateTime, double> DataCold = new Dictionary<DateTime, double>();
+			Data = report.ReadSvod(obj, -200, 200, isUstGroup);
+			foreach (KeyValuePair<DateTime, SvodDataRecord> de in Data) {
+				if (gp) {
+					DataHot.Add(de.Key, de.Value.GPHot);
+					DataCold.Add(de.Key, de.Value.GPCold);
+				} else {
+					DataHot.Add(de.Key, de.Value.PPHot);
+					DataCold.Add(de.Key, de.Value.PPCold);
+				}
+			}
+			chart.AddSerie("T_Hot", DataHot, ChartZedSerie.NextColor(), true, false, 0);
+			chart.AddSerie("T_Cold", DataCold, ChartZedSerie.NextColor(), true, false, 0);
 		}
 
 		private void oilClick_Click(object sender, RoutedEventArgs e) {

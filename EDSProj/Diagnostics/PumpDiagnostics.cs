@@ -34,6 +34,11 @@ namespace EDSProj.Diagnostics
 		public double PMin { get; set; }
 		public double PMax { get; set; }
 		public bool IsUst { get; set; }
+		public bool IsUstGP { get; set; }
+		public bool IsUstPP { get; set; }
+		public bool IsUstGPOhl { get; set; }
+		public bool IsUstPPOhl { get; set; }
+
 
 		public double LN1Time { get; set; }
 		public double LN2Time { get; set; }
@@ -59,6 +64,10 @@ namespace EDSProj.Diagnostics
 		public double PPCold { get; set; }
 		public double PPLevel { get; set; }
 
+		public double GPOhlRashod { get; set; }
+		public double PPOhlRashod { get; set; }
+
+
 
 	}
 
@@ -70,16 +79,16 @@ namespace EDSProj.Diagnostics
 		public DateTime EndDate { get; set; }
 		public static string DateFormat = "yyyy-MM-dd HH:mm:ss";
 
-		public PumpDiagnostics(DateTime dateStart,DateTime dateEnd) {
+		public PumpDiagnostics(DateTime dateStart, DateTime dateEnd) {
 			this.StartDate = dateStart;
 			this.EndDate = dateEnd;
 		}
 
-		public Dictionary<DateTime, PumpDataRecord> ReadDataPump(PumpTypeEnum type,int powerStart,int powerStop) {
+		public Dictionary<DateTime, PumpDataRecord> ReadDataPump(PumpTypeEnum type, int powerStart, int powerStop) {
 			SqlConnection con = ReportOutputFile.getConnection();
 
 			string query = String.Format("Select * from pumpTable where dateStart>='{0}' and dateEnd<='{1}' and isUst=1 and pAvg>={2} and pAvg<={3} and PumpType='{4}' order by dateStart",
-				StartDate.ToString(DateFormat), EndDate.ToString(DateFormat), powerStart, powerStop,type.ToString());
+				StartDate.ToString(DateFormat), EndDate.ToString(DateFormat), powerStart, powerStop, type.ToString());
 
 			SqlCommand com = con.CreateCommand();
 			com.CommandText = query;
@@ -88,7 +97,7 @@ namespace EDSProj.Diagnostics
 			SqlDataReader reader = com.ExecuteReader();
 			while (reader.Read()) {
 				PumpDataRecord rec = new PumpDataRecord();
-				
+
 				rec.DateStart = reader.GetDateTime(reader.GetOrdinal("DateStart"));
 				rec.DateEnd = reader.GetDateTime(reader.GetOrdinal("DateEnd"));
 				rec.IsUst = reader.GetBoolean(reader.GetOrdinal("IsUst"));
@@ -100,17 +109,17 @@ namespace EDSProj.Diagnostics
 				rec.PMin = reader.GetDouble(reader.GetOrdinal("PMin"));
 				rec.PMax = reader.GetDouble(reader.GetOrdinal("PMax"));
 				string tp = reader.GetString(reader.GetOrdinal("PumpType"));
-				rec.PumpType=(PumpTypeEnum)Enum.Parse(typeof(PumpTypeEnum), tp);
+				rec.PumpType = (PumpTypeEnum)Enum.Parse(typeof(PumpTypeEnum), tp);
 				Data.Add(rec.DateStart, rec);
 
 			}
 			return Data;
 		}
 
-		public Dictionary<DateTime, SvodDataRecord> ReadSvod(string groupName,double start,double stop) {
+		public Dictionary<DateTime, SvodDataRecord> ReadSvod(string groupName, double start, double stop, string IsUstGroup) {
 			SqlConnection con = ReportOutputFile.getConnection();
-			string query = String.Format("Select * from svodTable where dateStart>='{0}' and dateEnd<='{1}' and isUst=1 and {2}>={3} and {2}<={4} order by dateStart",
-				StartDate.ToString(DateFormat), EndDate.ToString(DateFormat), groupName, start.ToString().Replace(",","."), stop.ToString().Replace(",", "."));
+			string query = String.Format("Select * from svodTable where dateStart>='{0}' and dateEnd<='{1}' and {2}>={3} and {2}<={4} and {5}=1 order by dateStart",
+				StartDate.ToString(DateFormat), EndDate.ToString(DateFormat), groupName, start.ToString().Replace(",", "."), stop.ToString().Replace(",", "."), IsUstGroup);
 
 			SqlCommand com = con.CreateCommand();
 			com.CommandText = query;
@@ -122,6 +131,11 @@ namespace EDSProj.Diagnostics
 				rec.DateStart = reader.GetDateTime(reader.GetOrdinal("DateStart"));
 				rec.DateEnd = reader.GetDateTime(reader.GetOrdinal("DateEnd"));
 				rec.IsUst = reader.GetBoolean(reader.GetOrdinal("IsUst"));
+				rec.IsUstGP = reader.GetBoolean(reader.GetOrdinal("IsUstGP"));
+				rec.IsUstPP = reader.GetBoolean(reader.GetOrdinal("IsUstPP"));
+				rec.IsUstGPOhl = reader.GetBoolean(reader.GetOrdinal("IsUstGPOhl"));
+				rec.IsUstPPOhl = reader.GetBoolean(reader.GetOrdinal("IsUstPPOhl"));
+
 				rec.PAvg = reader.GetDouble(reader.GetOrdinal("P_Avg"));
 				rec.PMin = reader.GetDouble(reader.GetOrdinal("P_Min"));
 				rec.PMax = reader.GetDouble(reader.GetOrdinal("P_Max"));
@@ -149,7 +163,12 @@ namespace EDSProj.Diagnostics
 				rec.PPHot = reader.GetDouble(reader.GetOrdinal("PP_Hot"));
 				rec.PPCold = reader.GetDouble(reader.GetOrdinal("PP_Cold"));
 				rec.PPLevel = reader.GetDouble(reader.GetOrdinal("PP_Level"));
-				Data.Add(rec.DateStart,rec);
+
+				rec.GPOhlRashod= reader.GetDouble(reader.GetOrdinal("GP_OhlRash"));
+				rec.PPOhlRashod = reader.GetDouble(reader.GetOrdinal("PP_OhlRash"));
+
+
+				Data.Add(rec.DateStart, rec);
 			}
 			return Data;
 		}
@@ -230,17 +249,17 @@ order by mindate",
 
 			Dictionary<DateTime, double> Data = new Dictionary<DateTime, double>();
 			SqlDataReader reader = com.ExecuteReader();
-			while (reader.Read()) {				
+			while (reader.Read()) {
 				DateTime dateStart = reader.GetDateTime(reader.GetOrdinal("mindate"));
-				
+
 				double run = reader.GetInt32(reader.GetOrdinal("timeRun"));
-				
+
 				Data.Add(dateStart, run);
 			}
 			return Data;
 		}
 
-		public Dictionary<DateTime,double> Approx(Dictionary<DateTime,double> input) {
+		public Dictionary<DateTime, double> Approx(Dictionary<DateTime, double> input) {
 			Dictionary<DateTime, double> result = new Dictionary<DateTime, double>();
 			Dictionary<double, double> inputDouble = new Dictionary<double, double>();
 			Dictionary<double, double> resultDouble = new Dictionary<double, double>();
@@ -260,7 +279,7 @@ order by mindate",
 			double sumY = 0;
 			double sumX2 = 0;
 
-			foreach (KeyValuePair<double,double> de in inputDouble) {
+			foreach (KeyValuePair<double, double> de in inputDouble) {
 				sumX += de.Key;
 				sumY += de.Value;
 				sumX2 += de.Key * de.Key;
@@ -269,10 +288,10 @@ order by mindate",
 
 			int n = input.Count;
 
-			double a = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX*sumX);
+			double a = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
 			double b = (sumY - a * sumX) / n;
 
-			foreach (KeyValuePair<DateTime,double> de in input) {
+			foreach (KeyValuePair<DateTime, double> de in input) {
 				double x = dateKeys[de.Key];
 				double val = a * x + b;
 				result[de.Key] = val;

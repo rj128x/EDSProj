@@ -12,8 +12,8 @@ namespace EDSProj.Diagnostics
 
 	public class SvodFileReader
 	{
-		public static string InsertIntoHeader = "INSERT INTO SvodTable (DateStart, DateEnd,GG, P_Min,P_Max,P_Avg,IsUst,LN1_Time,LN2_Time,DN1_Time,DN2_Time,MNU1_Time,MNU2_Time,MNU3_Time,LN1_Pusk,LN2_Pusk,DN1_Pusk,DN2_Pusk,MNU1_Pusk,MNU2_Pusk,MNU3_Pusk,GP_Hot,GP_Cold,GP_Level,PP_Hot,PP_Cold,PP_Level)";
-		public static string InsertIntoFormat = "SELECT '{0}','{1}',{2}, {3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21},{22},{23},{24},{25},{26}";
+		public static string InsertIntoHeader = "INSERT INTO SvodTable (DateStart, DateEnd,GG, P_Min,P_Max,P_Avg,IsUst,LN1_Time,LN2_Time,DN1_Time,DN2_Time,MNU1_Time,MNU2_Time,MNU3_Time,LN1_Pusk,LN2_Pusk,DN1_Pusk,DN2_Pusk,MNU1_Pusk,MNU2_Pusk,MNU3_Pusk,GP_Hot,GP_Cold,GP_Level,PP_Hot,PP_Cold,PP_Level,IsUstGP,IsUstPP,GP_OhlRash,PP_OhlRash,IsUstGPOhl,IsUstPPOhl)";
+		public static string InsertIntoFormat = "SELECT '{0}','{1}',{2}, {3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21},{22},{23},{24},{25},{26},{27},{28},{29},{30},{31},{32}";
 		public static string DateFormat = "yyyy-MM-dd HH:mm:ss";
 		SortedList<DateTime, SvodDataRecord> Data = new SortedList<DateTime, SvodDataRecord>();
 
@@ -21,6 +21,13 @@ namespace EDSProj.Diagnostics
 		public SvodFileReader(string fileName) {
 			FileName = fileName;
 
+		}
+
+		public static bool IsUst(double min, double max, double avg, double proc) {
+			double diff = Math.Abs(avg / 100 * proc);
+			bool res = Math.Abs(avg - max) <= diff;
+			res = res && Math.Abs(avg - min) <= diff;
+			return res;
 		}
 
 		public bool ReadData() {
@@ -34,6 +41,8 @@ namespace EDSProj.Diagnostics
 				Logger.Info(e.ToString());
 				return false;
 			}
+
+			
 
 			for (int i = 2; i < outFile.Data.Count; i++) {
 				try {
@@ -64,13 +73,58 @@ namespace EDSProj.Diagnostics
 					rec.GPHot = ReportOutputFile.getDouble(fileRec[19]);
 					rec.GPCold = ReportOutputFile.getDouble(fileRec[20]);
 					rec.GPLevel = ReportOutputFile.getDouble(fileRec[21]);
+				
 
 					rec.PPHot = ReportOutputFile.getDouble(fileRec[22]);
 					rec.PPCold = ReportOutputFile.getDouble(fileRec[23]);
 					rec.PPLevel = ReportOutputFile.getDouble(fileRec[24]);
 
-					rec.IsUst = Math.Abs(rec.PAvg - rec.PMax) < 2;
-					rec.IsUst = rec.IsUst && Math.Abs(rec.PAvg - rec.PMin) < 2;
+					double GPLevelMin= ReportOutputFile.getDouble(fileRec[25]);
+					double PPLevelMin = ReportOutputFile.getDouble(fileRec[26]);
+					double GPLevelMax = ReportOutputFile.getDouble(fileRec[27]);
+					double PPLevelMax = ReportOutputFile.getDouble(fileRec[28]);
+
+					double gpHotMin= ReportOutputFile.getDouble(fileRec[29]);
+					double gpColdMin = ReportOutputFile.getDouble(fileRec[30]);
+					double gpHotMax = ReportOutputFile.getDouble(fileRec[31]);					
+					double gpColdMax = ReportOutputFile.getDouble(fileRec[32]);
+
+					double ppHotMin = ReportOutputFile.getDouble(fileRec[33]);
+					double ppColdMin = ReportOutputFile.getDouble(fileRec[34]);
+					double ppHotMax = ReportOutputFile.getDouble(fileRec[35]);
+					double ppColdMax = ReportOutputFile.getDouble(fileRec[36]);
+
+					double gpOhlAvg= ReportOutputFile.getDouble(fileRec[37]);
+					double gpOhlMin = ReportOutputFile.getDouble(fileRec[38]);
+					double gpOhlMax = ReportOutputFile.getDouble(fileRec[39]);
+
+					double ppOhlAvg1 = ReportOutputFile.getDouble(fileRec[40]);
+					double ppOhlMin1 = ReportOutputFile.getDouble(fileRec[41]);
+					double ppOhlMax1 = ReportOutputFile.getDouble(fileRec[42]);
+
+					double ppOhlAvg2 = ReportOutputFile.getDouble(fileRec[43]);
+					double ppOhlMin2 = ReportOutputFile.getDouble(fileRec[44]);
+					double ppOhlMax2 = ReportOutputFile.getDouble(fileRec[45]);
+
+					
+					rec.GPOhlRashod = gpOhlAvg;
+					rec.PPOhlRashod = ppOhlAvg1 + ppOhlAvg2;
+
+
+					rec.IsUst=IsUst(rec.PMin, rec.PMax, rec.PAvg, 2);
+
+					rec.IsUstGP = IsUst(GPLevelMin, GPLevelMax, rec.GPLevel,3);
+					rec.IsUstGP = rec.IsUstGP&&IsUst(gpHotMin, gpHotMax, rec.GPHot, 3);
+					rec.IsUstGP = rec.IsUstGP && IsUst(gpColdMin, gpColdMax, rec.GPCold, 3);
+
+					rec.IsUstPP = IsUst(PPLevelMin, PPLevelMax, rec.PPLevel, 3);
+					rec.IsUstPP = rec.IsUstPP && IsUst(ppHotMin, ppHotMax, rec.PPHot, 3);
+					rec.IsUstPP = rec.IsUstPP && IsUst(ppColdMin, ppColdMax, rec.PPCold, 3);
+
+					rec.IsUstGPOhl = IsUst(gpOhlMin, gpOhlMax, gpOhlAvg,5);
+					rec.IsUstPPOhl = IsUst(ppOhlMin1, ppOhlMax1, ppOhlAvg1, 5) && IsUst(ppOhlMin2, ppOhlMax2, ppOhlAvg2, 5);
+					
+
 					while (Data.ContainsKey(rec.DateStart))
 						rec.DateStart = rec.DateStart.AddMilliseconds(1);
 					Data.Add(rec.DateStart, rec);
@@ -119,12 +173,17 @@ namespace EDSProj.Diagnostics
 						de.Value.GPLevel.ToString().Replace(",", "."),
 						de.Value.PPHot.ToString().Replace(",", "."),
 						de.Value.PPCold.ToString().Replace(",", "."),
-						de.Value.PPLevel.ToString().Replace(",", ".")
+						de.Value.PPLevel.ToString().Replace(",", "."),
+						de.Value.IsUstGP ? 1 : 0,
+						de.Value.IsUstPP ? 1 : 0,
+						de.Value.GPOhlRashod.ToString().Replace(",", "."),
+						de.Value.GPOhlRashod.ToString().Replace(",", "."),
+						de.Value.IsUstGPOhl ? 1 : 0,
+						de.Value.IsUstPPOhl ? 1 : 0
 					);
 					insQueries.Add(ins);
 				}
 
-				con.Open();
 				SqlTransaction trans = con.BeginTransaction();
 				SqlCommand com = con.CreateCommand();
 				com.CommandText = delQ;

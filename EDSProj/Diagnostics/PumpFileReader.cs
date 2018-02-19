@@ -76,8 +76,9 @@ namespace EDSProj.Diagnostics
 					rec.LevelStop = ReportOutputFile.getDouble(fileRec[7]);
 					rec.PumpType = type;
 					rec.PumpNum = pumpNumber;
-					rec.IsUst = Math.Abs(rec.PAvg - rec.PMax) < 2;
-					rec.IsUst = rec.IsUst && Math.Abs(rec.PAvg - rec.PMin) < 2;
+					double diff = rec.PAvg / 100*2;
+					rec.IsUst = Math.Abs(rec.PAvg - rec.PMax) <= diff;
+					rec.IsUst = rec.IsUst && Math.Abs(rec.PAvg - rec.PMin) <= diff;
 					while (Data.ContainsKey(rec.DateStart))
 						rec.DateStart = rec.DateStart.AddMilliseconds(1);
 					Data.Add(rec.DateStart, rec);
@@ -127,7 +128,6 @@ namespace EDSProj.Diagnostics
 					insQueries.Add(ins);
 				}
 
-				con.Open();
 				SqlTransaction trans=con.BeginTransaction();
 				foreach (string delStr in DelQueries.Values) {
 					SqlCommand com = con.CreateCommand();
