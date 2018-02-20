@@ -112,6 +112,21 @@ namespace EDSApp
 			Process.Start("out.html");
 
 
+			ReportResultWindow win = new ReportResultWindow();
+			win.chart.init();
+			Dictionary<DateTime, double> data = new Dictionary<DateTime, double>();
+			int index = -1;
+			foreach (KeyValuePair<string, EDSReportRequestRecord> de in report.RequestData) {
+				string id = de.Key;
+				EDSReportRequestRecord request = de.Value;
+				data.Clear();
+				foreach (DateTime dt in report.ResultData.Keys) {
+					data.Add(dt, report.ResultData[dt][id]);
+				}
+				win.chart.AddSerie(request.Desc, data, ChartZedSerie.NextColor(), true, true, index++);
+			}
+			win.Show();
+
 		}
 
 		private void btnAbort_Click(object sender, RoutedEventArgs e) {

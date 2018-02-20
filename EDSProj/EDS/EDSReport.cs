@@ -58,7 +58,7 @@ namespace EDSProj.EDS
 
 		public async Task<bool> ReadData() {
 			ResultData = new Dictionary<DateTime, Dictionary<string, double>>();
-			DateTime date = DateStart.AddHours(0);
+			DateTime date = DateStart.AddHours(0);			
 			while (date < DateEnd) {
 				DateTime de = date.AddHours(0);
 				switch (Period) {
