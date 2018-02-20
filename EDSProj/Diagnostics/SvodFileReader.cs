@@ -177,7 +177,7 @@ namespace EDSProj.Diagnostics
 						de.Value.IsUstGP ? 1 : 0,
 						de.Value.IsUstPP ? 1 : 0,
 						de.Value.GPOhlRashod.ToString().Replace(",", "."),
-						de.Value.GPOhlRashod.ToString().Replace(",", "."),
+						de.Value.PPOhlRashod.ToString().Replace(",", "."),
 						de.Value.IsUstGPOhl ? 1 : 0,
 						de.Value.IsUstPPOhl ? 1 : 0
 					);

@@ -118,7 +118,7 @@ namespace EDSProj.Diagnostics
 
 		public Dictionary<DateTime, SvodDataRecord> ReadSvod(string groupName, double start, double stop, string IsUstGroup) {
 			SqlConnection con = ReportOutputFile.getConnection();
-			string query = String.Format("Select * from svodTable where dateStart>='{0}' and dateEnd<='{1}' and {2}>={3} and {2}<={4} and {5}=1 order by dateStart",
+			string query = String.Format("Select * from svodTable where dateStart>='{0}' and dateEnd<='{1}' and {2}>={3} and {2}<={4} and {5}>0 order by dateStart",
 				StartDate.ToString(DateFormat), EndDate.ToString(DateFormat), groupName, start.ToString().Replace(",", "."), stop.ToString().Replace(",", "."), IsUstGroup);
 
 			SqlCommand com = con.CreateCommand();

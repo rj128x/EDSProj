@@ -23,7 +23,7 @@ namespace EDSApp
 	{
 		public DiagWindow() {
 			InitializeComponent();
-			clndFrom.SelectedDate = DateTime.Now.Date.AddMonths(-3);
+			clndFrom.SelectedDate = DateTime.Now.Date.AddMonths(-1);
 			clndTo.SelectedDate = DateTime.Now.Date;
 
 		}
@@ -163,7 +163,7 @@ namespace EDSApp
 			createPumpPuskChart(LNPuskDay, PumpTypeEnum.Leakage, Data, DataRun, false);
 		}
 
-		public void createOilChart(ChartZedControl chart, bool gp, bool splitHot, bool splitCold, double step) {
+		public void createOilChart(ChartZedControl chart, bool gp, bool splitHot, bool splitCold, double step, bool isOhl) {
 			int ind = 0;
 			PumpDiagnostics report = new PumpDiagnostics(clndFrom.SelectedDate.Value, clndTo.SelectedDate.Value);
 			Dictionary<DateTime, SvodDataRecord> Data = new Dictionary<DateTime, SvodDataRecord>();
@@ -174,7 +174,12 @@ namespace EDSApp
 			string temp = splitHot ? "Hot" : "Cold";
 			obj = obj + temp;
 			string isUstGroup = gp ? "IsUstGP" : "IsUstPP";
+			if (isOhl)
+				isUstGroup += "Ohl";
 			bool split = splitHot || splitCold;
+			if (isOhl)
+				split = false;
+
 
 			List<double> AllTemps = new List<double>();
 			if (split) {
@@ -190,16 +195,19 @@ namespace EDSApp
 			foreach (double t in AllTemps) {
 				string headerRun = "";
 				string headerStop = "";
-				string header = "";
 
 				if (!split) {
-					headerRun = "Уровень масла (ГГ в работе)";
-					headerStop = "Уровень масла (ГГ стоит)";
-					header = "Уровень масла";
+					if (!isOhl) {
+						headerRun = "Уровень масла (ГГ в работе)";
+						headerStop = "Уровень масла (ГГ стоит)";
+					} else {
+						headerRun = "Расход (ГГ в работе)";
+						headerStop = "Расход (ГГ стоит)";
+					}
+
 				} else {
 					headerRun = String.Format("Уровень при t {0:0.0}-{1:0.0} (ГГ в работе)", t, t + step);
 					headerStop = String.Format("Уровень при t {0:0.0}-{1:0.0} (стоит)", t, t + step);
-					header = String.Format("Уровень при t {0:0.0}-{1:0.0}", t, t + step);
 				}
 
 
@@ -212,15 +220,15 @@ namespace EDSApp
 				foreach (KeyValuePair<DateTime, SvodDataRecord> de in Data) {
 					if (de.Value.PAvg == 0) {
 						if (gp) {
-							StopForApprox.Add(de.Key, de.Value.GPLevel);
+							StopForApprox.Add(de.Key, isOhl ? de.Value.GPOhlRashod : de.Value.GPLevel);
 						} else {
-							StopForApprox.Add(de.Key, de.Value.PPLevel);
+							StopForApprox.Add(de.Key, isOhl ? de.Value.PPOhlRashod : de.Value.PPLevel);
 						}
 					} else {
 						if (gp) {
-							RunForApprox.Add(de.Key, de.Value.GPLevel);
+							RunForApprox.Add(de.Key, isOhl ? de.Value.GPOhlRashod : de.Value.GPLevel);
 						} else {
-							RunForApprox.Add(de.Key, de.Value.PPLevel);
+							RunForApprox.Add(de.Key, isOhl ? de.Value.PPOhlRashod : de.Value.PPLevel);
 						}
 					}
 
@@ -234,7 +242,7 @@ namespace EDSApp
 
 				}
 				//line.Line.IsVisible = false;
-				if (StopForApprox.Count > 10) {
+				if (StopForApprox.Count > 10 && !isOhl) {
 					chart.AddSerie(headerStop, StopForApprox, color, false, true);
 
 					Dictionary<DateTime, double> appr = report.Approx(StopForApprox);
@@ -247,28 +255,32 @@ namespace EDSApp
 
 				//line.Line.IsVisible = false;
 			}
-			Dictionary<DateTime, double> DataHot = new Dictionary<DateTime, double>();
-			Dictionary<DateTime, double> DataCold = new Dictionary<DateTime, double>();
-			Data = report.ReadSvod(obj, -200, 200, isUstGroup);
-			foreach (KeyValuePair<DateTime, SvodDataRecord> de in Data) {
-				if (gp) {
-					DataHot.Add(de.Key, de.Value.GPHot);
-					DataCold.Add(de.Key, de.Value.GPCold);
-				} else {
-					DataHot.Add(de.Key, de.Value.PPHot);
-					DataCold.Add(de.Key, de.Value.PPCold);
+			if (!isOhl) {
+				Dictionary<DateTime, double> DataHot = new Dictionary<DateTime, double>();
+				Dictionary<DateTime, double> DataCold = new Dictionary<DateTime, double>();
+				Data = report.ReadSvod(obj, -200, 200, isUstGroup);
+				foreach (KeyValuePair<DateTime, SvodDataRecord> de in Data) {
+					if (gp) {
+						DataHot.Add(de.Key, de.Value.GPHot);
+						DataCold.Add(de.Key, de.Value.GPCold);
+					} else {
+						DataHot.Add(de.Key, de.Value.PPHot);
+						DataCold.Add(de.Key, de.Value.PPCold);
+					}
 				}
+				chart.AddSerie("T_Hot", DataHot, ChartZedSerie.NextColor(), true, false, 0);
+				chart.AddSerie("T_Cold", DataCold, ChartZedSerie.NextColor(), true, false, 0);
 			}
-			chart.AddSerie("T_Hot", DataHot, ChartZedSerie.NextColor(), true, false, 0);
-			chart.AddSerie("T_Cold", DataCold, ChartZedSerie.NextColor(), true, false, 0);
 		}
 
 		private void oilClick_Click(object sender, RoutedEventArgs e) {
 			bool splitHot = chbOilSplitHot.IsChecked.Value;
 			bool splitCold = chbOilSplitCold.IsChecked.Value;
 			double step = Double.Parse(txtOilSplitTemp.Text);
-			createOilChart(GPLevel, true, splitHot, splitCold, step);
-			createOilChart(PPLevel, false, splitHot, splitCold, step);
+			createOilChart(GPLevel, true, splitHot, splitCold, step, false);
+			createOilChart(PPLevel, false, splitHot, splitCold, step, false);
+			createOilChart(GPOhl, true, false, false, step, true);
+			createOilChart(PPOhl, false, false, false, step, true);
 		}
 
 

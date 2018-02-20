@@ -85,7 +85,7 @@
                     </Grid>
 
                 </TabItem>
-                <TabItem Header="Уровень масла">
+                <TabItem Header="ГП/ПП">
                     <Grid>
                         <Grid.RowDefinitions >
                             <RowDefinition Height="30"/>
@@ -101,11 +101,17 @@
                         </Border>
                         <Border Grid.Row="1">
                             <TabControl Grid.Row="1">
-                                <TabItem Header="ГП">
+                                <TabItem Header="ГП Масло">
                                     <local:ChartZedControl x:Name="GPLevel"/>
                                 </TabItem>
-                                <TabItem Header="ПП">
+                                <TabItem Header="ПП Масло">
                                     <local:ChartZedControl x:Name="PPLevel"/>
+                                </TabItem>
+                                <TabItem Header="ГП Охлаждение">
+                                    <local:ChartZedControl x:Name="GPOhl"/>
+                                </TabItem>
+                                <TabItem Header="ПП Охлаждение">
+                                    <local:ChartZedControl x:Name="PPOhl"/>
                                 </TabItem>
 
                             </TabControl>
