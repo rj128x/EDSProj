@@ -45,10 +45,10 @@ namespace AISImport
 				dateEnd = GetDate(args[1]);
 			}
 
-			/*date = DateTime.Parse("01.01.2018");
-			dateEnd = DateTime.Parse("18.01.2018 12:00");*/
+			//date = DateTime.Parse("01.01.2008");
+			//dateEnd = DateTime.Parse("01.01.2018 00:00");
 			while (date < dateEnd) {
-				DateTime de = date.AddHours(12);
+				DateTime de = date.AddHours(24);
 				de = de > dateEnd ? dateEnd : de;
 				ais.readDataFromDB(date, de);
 				date = de.AddHours(0);

@@ -76,6 +76,8 @@ namespace EDSApp
 				splitPower = 200;
 				powers.Add(-1);
 			}
+			Dictionary<DateTime, double> dataLStart = new Dictionary<DateTime, double>();
+			Dictionary<DateTime, double> dataLStop = new Dictionary<DateTime, double>();
 			foreach (int p in powers) {
 				string header = "";
 				if (!split) {
@@ -97,8 +99,11 @@ namespace EDSApp
 					System.Drawing.Color color = ChartZedSerie.NextColor();
 
 					Dictionary<DateTime, double> data = new Dictionary<DateTime, double>();
+					
 					foreach (KeyValuePair<DateTime, PumpDataRecord> de in Data) {
 						data.Add(de.Key, de.Value.RunTime);
+						dataLStart.Add(de.Key, de.Value.LevelStart);
+						dataLStop.Add(de.Key, de.Value.LevelStop);
 					}
 
 					chart.AddSerie(header, data, color, false, true);
@@ -106,8 +111,12 @@ namespace EDSApp
 					Dictionary<DateTime, double> appr = report.Approx(data);
 
 					chart.AddSerie(header, appr, color, true, false);
+
+					
 				}
 			}
+			chart.AddSerie("LStart", dataLStart, ChartZedSerie.NextColor(), true, false, 0);
+			chart.AddSerie("LStop", dataLStop, ChartZedSerie.NextColor(), true, false, 0);
 		}
 
 
