@@ -110,7 +110,7 @@ namespace EDSApp
 
 					Dictionary<DateTime, double> appr = report.Approx(data);
 
-					chart.AddSerie(header, appr, color, true, false);
+					ChartZedSerie ser=chart.AddSerie(header, appr, color, true, false,-1,false);
 
 					
 				}
@@ -247,15 +247,14 @@ namespace EDSApp
 					chart.AddSerie(headerRun, RunForApprox, color, false, true);
 
 					Dictionary<DateTime, double> appr = report.Approx(RunForApprox);
-					chart.AddSerie(headerRun, appr, color, true, false);
-
+					ChartZedSerie ser=chart.AddSerie(headerRun, appr, color, true, false,-1,false);
 				}
 				//line.Line.IsVisible = false;
 				if (StopForApprox.Count > 10 && !isOhl) {
 					chart.AddSerie(headerStop, StopForApprox, color, false, true);
 
 					Dictionary<DateTime, double> appr = report.Approx(StopForApprox);
-					chart.AddSerie(headerStop, appr, color, true, false);
+					ChartZedSerie ser = chart.AddSerie(headerStop, appr, color, true, false,-1,false);
 
 				}
 

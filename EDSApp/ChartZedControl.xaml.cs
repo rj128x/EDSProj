@@ -97,15 +97,24 @@ namespace EDSApp
 			chart.GraphPane.CurveList.Clear();
 			chart.GraphPane.XAxis.Type = AxisType.Date;
 			chart.GraphPane.XAxis.Scale.Format = "dd.MM";
-			chart.GraphPane.YAxis.Scale.Format = "00";
 			chart.GraphPane.XAxis.Title.IsVisible = false;
-			chart.GraphPane.YAxis.Title.Text = "";
-			chart.GraphPane.YAxis.Title.FontSpec.Size = 7;
+
+			chart.GraphPane.YAxis.Title.IsVisible = false;
+			chart.GraphPane.YAxis.Scale.FontSpec.Size = 5;
+			chart.GraphPane.YAxis.Scale.IsUseTenPower = false;
+			chart.GraphPane.YAxis.MajorGrid.IsVisible = true;
+			chart.GraphPane.YAxis.MinorTic.IsOpposite = false;
+			chart.GraphPane.YAxis.MajorTic.IsOpposite = false;
+			
+
 			chart.GraphPane.Title.IsVisible = false;
 			chart.GraphPane.Legend.IsVisible = false;
 			chart.IsZoomOnMouseCenter = false;
-			chart.GraphPane.YAxis.Scale.FontSpec.Size = 10;
+
+			
 			chart.GraphPane.XAxis.Scale.FontSpec.Size = 10;
+			chart.GraphPane.XAxis.MajorGrid.IsVisible = true;
+
 			ChartZedSerie.indexColor = 0;
 
 		}
@@ -124,7 +133,7 @@ namespace EDSApp
 			chart.GraphPane.XAxis.Scale.Max = XDate.DateTimeToXLDate(max);
 		}
 
-		public void AddSerie(String header, Dictionary<DateTime, double> values, System.Drawing.Color color, bool line, bool symbol,int y2axisIndex=-1) {
+		public ChartZedSerie AddSerie(String header, Dictionary<DateTime, double> values, System.Drawing.Color color, bool line, bool symbol, int y2axisIndex = -1, bool isVisible = true) {
 			PointPairList points = new PointPairList();
 			foreach (KeyValuePair<DateTime, double> de in values) {
 				points.Add(new PointPair(new XDate(de.Key), de.Value));
@@ -143,22 +152,33 @@ namespace EDSApp
 				lineItem.Symbol.Fill = new Fill(color);
 			}
 			ObsSeries.Add(serie);
+			serie.IsVisible = isVisible;
+			serie.Item.IsVisible = isVisible;
 
 			if (y2axisIndex > -1) {
 				while (chart.GraphPane.Y2AxisList.Count()< y2axisIndex + 1) {
 					chart.GraphPane.Y2AxisList.Add(new Y2Axis());
 				}
+				chart.GraphPane.Y2AxisList[y2axisIndex].Title.IsVisible = false;
+				chart.GraphPane.Y2AxisList[y2axisIndex].Scale.FontSpec.Size = 5;
+				chart.GraphPane.Y2AxisList[y2axisIndex].Scale.IsLabelsInside = true;
+				chart.GraphPane.Y2AxisList[y2axisIndex].Scale.IsUseTenPower = false;
 				chart.GraphPane.Y2AxisList[y2axisIndex].IsVisible = true;
-				chart.GraphPane.Y2AxisList[y2axisIndex].Scale.FontSpec.Size = 10;
-				chart.GraphPane.Y2AxisList[y2axisIndex].Title.FontSpec.Size = 7;
-				
+				chart.GraphPane.Y2AxisList[y2axisIndex].Scale.FontSpec.Angle = (float)(-Math.PI / 2.0);
+				chart.GraphPane.Y2AxisList[y2axisIndex].MajorTic.IsOpposite = false;
+				chart.GraphPane.Y2AxisList[y2axisIndex].MinorTic.IsOpposite = false;
+				chart.GraphPane.Y2AxisList[y2axisIndex].Scale.FontSpec.FontColor = color;
+				chart.GraphPane.Y2AxisList[y2axisIndex].Color = color;				
+
 				lineItem.IsY2Axis = true;
 				lineItem.YAxisIndex = y2axisIndex;
+
 			}
 			refreshDates();
 			chart.AxisChange();
 			chart.Invalidate();
 
+			return serie;
 		}
 
 
