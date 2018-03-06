@@ -35,8 +35,8 @@ namespace EDSApp
 		private void drenClick_Click(object sender, RoutedEventArgs e) {
 			int splitPower = Int32.Parse(txtDNSplitPower.Text);
 			PumpDiagnostics report = new PumpDiagnostics(clndFrom.SelectedDate.Value, clndTo.SelectedDate.Value);
-			Dictionary<DateTime, SvodDataRecord> Data = report.ReadPumpSvod("P_Avg", -1, 200);
-			Dictionary<DateTime, double> DataRun = report.ReadGGRun();
+			SortedList<DateTime, SvodDataRecord> Data = report.ReadPumpSvod("P_Avg", -1, 200);
+			SortedList<DateTime, double> DataRun = report.ReadGGRun();
 
 
 			createPumpRunChart(DNTimeWork, PumpTypeEnum.Drenage, chbDNSplitPower.IsChecked.Value, splitPower);
@@ -60,7 +60,7 @@ namespace EDSApp
 		public void createPumpRunChart(ChartZedControl chart, PumpTypeEnum type, bool split, int splitPower) {
 			int ind = 0;
 			PumpDiagnostics report = new PumpDiagnostics(clndFrom.SelectedDate.Value, clndTo.SelectedDate.Value);
-			Dictionary<DateTime, PumpDataRecord> Data = new Dictionary<DateTime, PumpDataRecord>();
+			SortedList<DateTime, PumpDataRecord> Data = new SortedList<DateTime, PumpDataRecord>();
 
 			chart.init();
 
@@ -76,8 +76,8 @@ namespace EDSApp
 				splitPower = 200;
 				powers.Add(-1);
 			}
-			Dictionary<DateTime, double> dataLStart = new Dictionary<DateTime, double>();
-			Dictionary<DateTime, double> dataLStop = new Dictionary<DateTime, double>();
+			SortedList<DateTime, double> dataLStart = new SortedList<DateTime, double>();
+			SortedList<DateTime, double> dataLStop = new SortedList<DateTime, double>();
 			foreach (int p in powers) {
 				string header = "";
 				if (!split) {
@@ -94,11 +94,11 @@ namespace EDSApp
 				}
 
 
-				if (Data.Count > 10) {
+				if (Data.Count > 1) {
 
 					System.Drawing.Color color = ChartZedSerie.NextColor();
 
-					Dictionary<DateTime, double> data = new Dictionary<DateTime, double>();
+					SortedList<DateTime, double> data = new SortedList<DateTime, double>();
 					
 					foreach (KeyValuePair<DateTime, PumpDataRecord> de in Data) {
 						data.Add(de.Key, de.Value.RunTime);
@@ -108,7 +108,7 @@ namespace EDSApp
 
 					chart.AddSerie(header, data, color, false, true);
 
-					Dictionary<DateTime, double> appr = report.Approx(data);
+					SortedList<DateTime, double> appr = report.Approx(data);
 
 					ChartZedSerie ser=chart.AddSerie(header, appr, color, true, false,-1,false);
 
@@ -123,13 +123,13 @@ namespace EDSApp
 
 
 
-		public void createPumpPuskChart(ChartZedControl chart, PumpTypeEnum type, Dictionary<DateTime, SvodDataRecord> Data, Dictionary<DateTime, double> DataRun, bool time) {
+		public void createPumpPuskChart(ChartZedControl chart, PumpTypeEnum type, SortedList<DateTime, SvodDataRecord> Data, SortedList<DateTime, double> DataRun, bool time) {
 			int ind = 0;
 			chart.init();
 			List<int> powers = new List<int>();
 
 			if (Data.Count > 0) {
-				Dictionary<DateTime, double> data = new Dictionary<DateTime, double>();
+				SortedList<DateTime, double> data = new SortedList<DateTime, double>();
 				System.Drawing.Color color = ChartZedSerie.NextColor();
 				foreach (KeyValuePair<DateTime, SvodDataRecord> de in Data) {
 					double val = 0;
@@ -164,8 +164,8 @@ namespace EDSApp
 			int splitPower = Int32.Parse(txtMNUSplitPower.Text);
 			createPumpRunChart(MNUTimeWork, PumpTypeEnum.MNU, chbMNUSplitPower.IsChecked.Value, splitPower);
 			PumpDiagnostics report = new PumpDiagnostics(clndFrom.SelectedDate.Value, clndTo.SelectedDate.Value);
-			Dictionary<DateTime, SvodDataRecord> Data = report.ReadPumpSvod("P_Avg", -1, 200);
-			Dictionary<DateTime, double> DataRun = report.ReadGGRun();
+			SortedList<DateTime, SvodDataRecord> Data = report.ReadPumpSvod("P_Avg", -1, 200);
+			SortedList<DateTime, double> DataRun = report.ReadGGRun();
 			createPumpPuskChart(MNUTimeDay, PumpTypeEnum.MNU, Data, DataRun, true);
 			createPumpPuskChart(MNUPuskDay, PumpTypeEnum.MNU, Data, DataRun, false);
 			createPumpPuskChart(LNTimeDay, PumpTypeEnum.Leakage, Data, DataRun, true);
@@ -220,8 +220,8 @@ namespace EDSApp
 				}
 
 
-				Dictionary<DateTime, double> RunForApprox = new Dictionary<DateTime, double>();
-				Dictionary<DateTime, double> StopForApprox = new Dictionary<DateTime, double>();
+				SortedList<DateTime, double> RunForApprox = new SortedList<DateTime, double>();
+				SortedList<DateTime, double> StopForApprox = new SortedList<DateTime, double>();
 
 
 
@@ -243,17 +243,17 @@ namespace EDSApp
 
 				}
 				System.Drawing.Color color = ChartZedSerie.NextColor();
-				if (RunForApprox.Count > 10) {
+				if (RunForApprox.Count > 1) {
 					chart.AddSerie(headerRun, RunForApprox, color, false, true);
 
-					Dictionary<DateTime, double> appr = report.Approx(RunForApprox);
+					SortedList<DateTime, double> appr = report.Approx(RunForApprox);
 					ChartZedSerie ser=chart.AddSerie(headerRun, appr, color, true, false,-1,false);
 				}
 				//line.Line.IsVisible = false;
-				if (StopForApprox.Count > 10 && !isOhl) {
+				if (StopForApprox.Count > 1 && !isOhl) {
 					chart.AddSerie(headerStop, StopForApprox, color, false, true);
 
-					Dictionary<DateTime, double> appr = report.Approx(StopForApprox);
+					SortedList<DateTime, double> appr = report.Approx(StopForApprox);
 					ChartZedSerie ser = chart.AddSerie(headerStop, appr, color, true, false,-1,false);
 
 				}
@@ -264,8 +264,8 @@ namespace EDSApp
 				//line.Line.IsVisible = false;
 			}
 			if (!isOhl) {
-				Dictionary<DateTime, double> DataHot = new Dictionary<DateTime, double>();
-				Dictionary<DateTime, double> DataCold = new Dictionary<DateTime, double>();
+				SortedList<DateTime, double> DataHot = new SortedList<DateTime, double>();
+				SortedList<DateTime, double> DataCold = new SortedList<DateTime, double>();
 				Data = report.ReadSvod(obj, -200, 200, isUstGroup);
 				foreach (KeyValuePair<DateTime, SvodDataRecord> de in Data) {
 					if (gp) {

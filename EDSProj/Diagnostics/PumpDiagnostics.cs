@@ -84,7 +84,7 @@ namespace EDSProj.Diagnostics
 			this.EndDate = dateEnd;
 		}
 
-		public Dictionary<DateTime, PumpDataRecord> ReadDataPump(PumpTypeEnum type, int powerStart, int powerStop) {
+		public SortedList<DateTime, PumpDataRecord> ReadDataPump(PumpTypeEnum type, int powerStart, int powerStop) {
 			SqlConnection con = ReportOutputFile.getConnection();
 
 			string query = String.Format("Select * from pumpTable where dateStart>='{0}' and dateEnd<='{1}' and isUst=1 and pAvg>={2} and pAvg<={3} and PumpType='{4}' order by dateStart",
@@ -93,7 +93,7 @@ namespace EDSProj.Diagnostics
 			SqlCommand com = con.CreateCommand();
 			com.CommandText = query;
 
-			Dictionary<DateTime, PumpDataRecord> Data = new Dictionary<DateTime, PumpDataRecord>();
+			SortedList<DateTime, PumpDataRecord> Data = new SortedList<DateTime, PumpDataRecord>();
 			SqlDataReader reader = com.ExecuteReader();
 			while (reader.Read()) {
 				PumpDataRecord rec = new PumpDataRecord();
@@ -173,7 +173,7 @@ namespace EDSProj.Diagnostics
 			return Data;
 		}
 
-		public Dictionary<DateTime, SvodDataRecord> ReadPumpSvod(string groupName, double start, double stop) {
+		public SortedList<DateTime, SvodDataRecord> ReadPumpSvod(string groupName, double start, double stop) {
 			SqlConnection con = ReportOutputFile.getConnection();
 			string query = String.Format(
 @"select  
@@ -203,7 +203,7 @@ order by mindate",
 			SqlCommand com = con.CreateCommand();
 			com.CommandText = query;
 
-			Dictionary<DateTime, SvodDataRecord> Data = new Dictionary<DateTime, SvodDataRecord>();
+			SortedList<DateTime, SvodDataRecord> Data = new SortedList<DateTime, SvodDataRecord>();
 			SqlDataReader reader = com.ExecuteReader();
 			while (reader.Read()) {
 				SvodDataRecord rec = new SvodDataRecord();
@@ -231,7 +231,7 @@ order by mindate",
 			return Data;
 		}
 
-		public Dictionary<DateTime, double> ReadGGRun() {
+		public SortedList<DateTime, double> ReadGGRun() {
 			SqlConnection con = ReportOutputFile.getConnection();
 			string query = String.Format(
 @"select  
@@ -247,7 +247,7 @@ order by mindate",
 			SqlCommand com = con.CreateCommand();
 			com.CommandText = query;
 
-			Dictionary<DateTime, double> Data = new Dictionary<DateTime, double>();
+			SortedList<DateTime, double> Data = new SortedList<DateTime, double>();
 			SqlDataReader reader = com.ExecuteReader();
 			while (reader.Read()) {
 				DateTime dateStart = reader.GetDateTime(reader.GetOrdinal("mindate"));
@@ -259,11 +259,11 @@ order by mindate",
 			return Data;
 		}
 
-		public Dictionary<DateTime, double> Approx(Dictionary<DateTime, double> input) {
-			Dictionary<DateTime, double> result = new Dictionary<DateTime, double>();
-			Dictionary<double, double> inputDouble = new Dictionary<double, double>();
-			Dictionary<double, double> resultDouble = new Dictionary<double, double>();
-			Dictionary<DateTime, double> dateKeys = new Dictionary<DateTime, double>();
+		public SortedList<DateTime, double> Approx(SortedList<DateTime, double> input) {
+			SortedList<DateTime, double> result = new SortedList<DateTime, double>();
+			SortedList<double, double> inputDouble = new SortedList<double, double>();
+			SortedList<double, double> resultDouble = new SortedList<double, double>();
+			SortedList<DateTime, double> dateKeys = new SortedList<DateTime, double>();
 
 			DateTime first = input.Keys.First();
 			foreach (DateTime date in input.Keys) {

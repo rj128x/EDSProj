@@ -114,7 +114,7 @@ namespace EDSApp
 
 			ReportResultWindow win = new ReportResultWindow();
 			win.chart.init();
-			Dictionary<DateTime, double> data = new Dictionary<DateTime, double>();
+			SortedList<DateTime, double> data = new SortedList<DateTime, double>();
 			int index = -1;
 			foreach (KeyValuePair<string, EDSReportRequestRecord> de in report.RequestData) {
 				string id = de.Key;

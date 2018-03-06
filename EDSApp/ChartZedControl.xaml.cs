@@ -45,6 +45,7 @@ namespace EDSApp
 		}
 		public string Header { get; set; }
 		public LineItem Item { get; set; }
+		public int Y2Index { get; set; }
 
 		private bool _isVisible;
 		public bool IsVisible {
@@ -67,7 +68,7 @@ namespace EDSApp
 		}
 
 		public Brush FillBrush { get; set; }
-		public Dictionary<DateTime, double> Data { get; set; }
+		public SortedList<DateTime, double> Data { get; set; }
 	}
 	/// <summary>
 	/// Логика взаимодействия для ChartZedControl.xaml
@@ -105,13 +106,13 @@ namespace EDSApp
 			chart.GraphPane.YAxis.MajorGrid.IsVisible = true;
 			chart.GraphPane.YAxis.MinorTic.IsOpposite = false;
 			chart.GraphPane.YAxis.MajorTic.IsOpposite = false;
-			
+
 
 			chart.GraphPane.Title.IsVisible = false;
 			chart.GraphPane.Legend.IsVisible = false;
 			chart.IsZoomOnMouseCenter = false;
 
-			
+
 			chart.GraphPane.XAxis.Scale.FontSpec.Size = 10;
 			chart.GraphPane.XAxis.MajorGrid.IsVisible = true;
 
@@ -133,7 +134,7 @@ namespace EDSApp
 			chart.GraphPane.XAxis.Scale.Max = XDate.DateTimeToXLDate(max);
 		}
 
-		public ChartZedSerie AddSerie(String header, Dictionary<DateTime, double> values, System.Drawing.Color color, bool line, bool symbol, int y2axisIndex = -1, bool isVisible = true) {
+		public ChartZedSerie AddSerie(String header, SortedList<DateTime, double> values, System.Drawing.Color color, bool line, bool symbol, int y2axisIndex = -1, bool isVisible = true) {
 			PointPairList points = new PointPairList();
 			foreach (KeyValuePair<DateTime, double> de in values) {
 				points.Add(new PointPair(new XDate(de.Key), de.Value));
@@ -154,9 +155,10 @@ namespace EDSApp
 			ObsSeries.Add(serie);
 			serie.IsVisible = isVisible;
 			serie.Item.IsVisible = isVisible;
+			serie.Y2Index = y2axisIndex;
 
 			if (y2axisIndex > -1) {
-				while (chart.GraphPane.Y2AxisList.Count()< y2axisIndex + 1) {
+				while (chart.GraphPane.Y2AxisList.Count() < y2axisIndex + 1) {
 					chart.GraphPane.Y2AxisList.Add(new Y2Axis());
 				}
 				chart.GraphPane.Y2AxisList[y2axisIndex].Title.IsVisible = false;
@@ -168,7 +170,7 @@ namespace EDSApp
 				chart.GraphPane.Y2AxisList[y2axisIndex].MajorTic.IsOpposite = false;
 				chart.GraphPane.Y2AxisList[y2axisIndex].MinorTic.IsOpposite = false;
 				chart.GraphPane.Y2AxisList[y2axisIndex].Scale.FontSpec.FontColor = color;
-				chart.GraphPane.Y2AxisList[y2axisIndex].Color = color;				
+				chart.GraphPane.Y2AxisList[y2axisIndex].Color = color;
 
 				lineItem.IsY2Axis = true;
 				lineItem.YAxisIndex = y2axisIndex;
@@ -189,18 +191,32 @@ namespace EDSApp
 				ChartZedSerie ser = grdLegend.SelectedItem as ChartZedSerie;
 				ser.Item.IsVisible = chb.IsChecked.Value;
 				ser.IsVisible = chb.IsChecked.Value;
-				chart.AxisChange();
-				chart.Invalidate();
+				refresh();
 			} catch { }
+		}
+
+		public void refresh() {
+			for (int i = 0; i < chart.GraphPane.Y2AxisList.Count; i++) {
+				bool vis = false;
+				foreach (ChartZedSerie ser in ObsSeries) {
+					if (ser.IsVisible && (ser.Y2Index == i)) {
+						vis = true;
+					}
+				}
+				chart.GraphPane.Y2AxisList[i].IsVisible = vis;
+			}
+			chart.AxisChange();
+			chart.Invalidate();
 		}
 
 		private void SetAll(bool visible) {
 			foreach (ChartZedSerie ser in ObsSeries) {
 				ser.Item.IsVisible = visible;
 				ser.IsVisible = visible;
-				chart.AxisChange();
-				chart.Invalidate();
+
 			}
+			refresh();
+
 		}
 
 		private void btnSelectAll_Click(object sender, RoutedEventArgs e) {
