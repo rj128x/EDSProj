@@ -12,7 +12,7 @@ namespace Diagnostics
 {
 	class Program
 	{
-		static void Main(string[] args) {
+		static void Main(string[] args) { 
 			Settings.init("Data/Settings.xml");
 			Logger.InitFileLogger(Settings.Single.LogPath, "Diagnostics");
 			if (args.Length >= 1) {
