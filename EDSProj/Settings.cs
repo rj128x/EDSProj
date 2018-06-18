@@ -65,8 +65,9 @@ namespace EDSProj
 		public int FTPAOPort { get; set; }
 		public string FTPAOUser { get; set; }
 		public string FTPAOPassword { get; set; }
+        public string AOMail { get; set; }
 
-		public string DiadDBServer { get; set; }
+        public string DiadDBServer { get; set; }
 		public string DiagDBPassword { get; set; }
 		public string DiagDBUser { get; set; }
 		public string DiagDBName { get; set; }

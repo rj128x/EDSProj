@@ -16,7 +16,8 @@ namespace EDSProj.ModesCentre
 		public string MCName { get; set; }
 		public string EDSPoint { get; set; }
 		public string IntegratedEDSPoint { get; set; }
-	}
+        
+    }
 
 
 	public class MCSettings
@@ -26,8 +27,9 @@ namespace EDSProj.ModesCentre
 		public string MCPassword { get; set; }
 		public List<MCSettingsRecord> MCData { get; set; }
 		public static MCSettings Single { get; protected set; }
-				
-		public static void init(string filename = null) {
+        
+
+        public static void init(string filename = null) {
 			if (filename == null) {
 				filename = "Data\\MCSettings.xml";
 			}

@@ -19,6 +19,7 @@
   <FTPPassword>Ovation1</FTPPassword> <!--Пароль FTP-->
 
   <AOLocalDir>c:/ao_data</AOLocalDir>
+  <AOMail>autooper_votges@votges.rushydro.ru</AOMail>
   <FTPAOActive>false</FTPAOActive> <!--Активный режим FTP-->
   <FTPAOServer>sr-votges-015</FTPAOServer> <!--Адрес FTP сервера-->
   <FTPAOPort>21</FTPAOPort> <!--Порт 21-->
