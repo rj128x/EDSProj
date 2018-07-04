@@ -12,19 +12,7 @@
   <EDSUser>admin</EDSUser>
   <EDSPassword>Ovation123</EDSPassword>
   
-  <FTPActive>false</FTPActive> <!--Активный режим FTP-->
-  <FTPServer>10.7.227.12</FTPServer> <!--Адрес FTP сервера-->
-  <FTPPort>21</FTPPort> <!--Порт 21-->
-  <FTPUser>Administrator</FTPUser> <!--Пользователь FTP-->
-  <FTPPassword>Ovation1</FTPPassword> <!--Пароль FTP-->
-
-  <AOLocalDir>c:/ao_data</AOLocalDir>
-  <AOMail>autooper_votges@votges.rushydro.ru</AOMail>
-  <FTPAOActive>false</FTPAOActive> <!--Активный режим FTP-->
-  <FTPAOServer>sr-votges-015</FTPAOServer> <!--Адрес FTP сервера-->
-  <FTPAOPort>21</FTPAOPort> <!--Порт 21-->
-  <FTPAOUser>AO_USER</FTPAOUser> <!--Пользователь FTP-->
-  <FTPAOPassword>Ovation1</FTPAOPassword> <!--Пароль FTP-->
+  <AOMail>autooper_votges@rushydro.ru</AOMail>
 
   <DiadDBServer>sr-votges-015\sqlexpress</DiadDBServer>
   <DiagDBPassword>psWD!159!</DiagDBPassword>

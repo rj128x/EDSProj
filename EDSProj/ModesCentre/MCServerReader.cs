@@ -205,7 +205,7 @@ namespace EDSProj.ModesCentre
 			return ok;
 		}
 
-		protected void sendAutooperData1() {
+		/*protected void sendAutooperData1() {
 			string fn = "pbr-0000" + (NPBR < 10 ? "0" : "") + NPBR.ToString() + "-" + Date.ToString("yyyyMMdd") + ".csv";
 			string body = String.Join("\r\n", AutooperData);
 			try {
@@ -220,7 +220,7 @@ namespace EDSProj.ModesCentre
 				file.Delete();
 			} catch { }
 
-		}
+		}*/
 
         public void sendAutooperData()
         {
@@ -235,7 +235,11 @@ namespace EDSProj.ModesCentre
 				}
 				writer.Close();*/
 
-                FileInfo file = new FileInfo(fn);
+                StreamWriter sw = new StreamWriter("c:/int/ftpfolder/"+fn, false);
+                sw.WriteLine(body);
+                sw.Close();
+
+                //FileInfo file = new FileInfo("c:/int/ftpfolder/"+fn);
                 System.Net.Mail.MailMessage mess = new System.Net.Mail.MailMessage();
 
                 mess.From = new MailAddress(Settings.Single.SMTPFrom);
@@ -243,6 +247,7 @@ namespace EDSProj.ModesCentre
                 mess.Subject = "pbr-0000" + (NPBR < 10 ? "0" : "") + NPBR.ToString() + "-" + Date.ToString("yyyyMMdd");
                 mess.Body = body;
                 mess.To.Add(Settings.Single.AOMail);
+                Logger.Info(Settings.Single.AOMail);
                 //mess.Attachments.Add(new Attachment(fn));
 
                 mess.SubjectEncoding = System.Text.Encoding.Default;
@@ -261,11 +266,11 @@ namespace EDSProj.ModesCentre
                 // Отправляем письмо
                 client.Send(mess);
                 Logger.Info("Данные в автооператор отправлены успешно");
-                try
+                /*try
                 {
                     file.Delete();
                 }
-                catch { };
+                catch { };*/
             }
             catch (Exception e)
             {

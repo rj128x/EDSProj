@@ -53,18 +53,6 @@ namespace EDSProj
 
 		public string LogPath { get; set; }
 
-		public bool FTPActive { get; set; }
-		public string FTPServer { get; set; }
-		public int FTPPort { get; set; }
-		public string FTPUser { get; set; }
-		public string FTPPassword { get; set; }
-
-		public string AOLocalDir { get; set; }
-		public bool FTPAOActive { get; set; }
-		public string FTPAOServer { get; set; }
-		public int FTPAOPort { get; set; }
-		public string FTPAOUser { get; set; }
-		public string FTPAOPassword { get; set; }
         public string AOMail { get; set; }
 
         public string DiadDBServer { get; set; }

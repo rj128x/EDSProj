@@ -37,26 +37,9 @@ namespace EDSPBR
 			bool ok=EDSClass.ProcessQuery(reqId);
 			Console.WriteLine(ok.ToString());*/
 			
+			MCSettings.init("Data/MCSettings.xml");
+			MCServerReader reader = new MCServerReader(DateTime.Now.Date);
 
-			if (args.Length >= 1) {
-				string task = args[0];
-				task = task.ToLower();
-				switch (task) {
-					case "copy":
-						FTPClass.copyFolder();
-						break;
-					case "import":
-						MCSettings.init("Data/MCSettings.xml");
-						MCServerReader reader = new MCServerReader(DateTime.Now.Date);
-						break;
-				}
-			} else {
-				Console.WriteLine("Ключи командной строки: \r\n import: для импорта ПБР \r\n copy: для копирования файлов на ftp");
-				Console.ReadLine();
-			}
-			
-			
-			//Console.ReadLine();
 		}
 	}
 }
