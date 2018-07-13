@@ -67,6 +67,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AIS\AIS_1MIN.cs" />
     <Compile Include="AIS\AIS_NEW.cs" />
     <Compile Include="AIS\AIS_OLD.cs" />
     <Compile Include="Diagnostics\PumpDiagnostics.cs" />
@@ -95,13 +96,10 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="DATA\ais_new - Копировать.txt">
+    <Content Include="DATA\ais_new_1min.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="DATA\ais_new.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="DATA\ais_old - Копировать.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="DATA\ais_old.txt">

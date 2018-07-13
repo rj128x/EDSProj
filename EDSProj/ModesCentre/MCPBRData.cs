@@ -12,18 +12,22 @@ namespace EDSProj.ModesCentre
 	{
 		public SortedList<DateTime, double> Data { get; set; }
 		public SortedList<DateTime, double> DataHH { get; set; }
-		public int Item { get; set; }
+        public SortedList<DateTime, double> DataSmooth { get; set; }
+        public int Item { get; set; }
 		public string PointName { get; set; }
+        public string SmoothPointName { get; set; }
 		public MCSettingsRecord DataSettings;
 
 		public MCPBRData(MCSettingsRecord rec) {
 			Item = rec.PiramidaCode;
 			PointName = rec.EDSPoint;
+            SmoothPointName = rec.EDSPointSmooth;
 			Logger.Info(rec.EDSPoint);
 			DataSettings = rec;
 
 			Data = new SortedList<DateTime, double>();
 			DataHH = new SortedList<DateTime, double>();
+            DataSmooth = new SortedList<DateTime, double>();
 		}
 
 		public static List<MCPBRData> getPBRS(int mcCode, string mcName) {
@@ -93,7 +97,37 @@ namespace EDSProj.ModesCentre
 			return hh;
 		}
 
-		protected SortedList<DateTime, double> createHH15Data() {
+        protected SortedList<DateTime, double> createSmoothData()
+        {
+            SortedList<DateTime, double> hh = new SortedList<DateTime, double>();
+            int index = 0;
+            foreach (KeyValuePair<DateTime, double> de in Data)
+            {
+                hh.Add(de.Key, de.Value);
+                DateTime nextDate = index < Data.Count - 1 ? Data.Keys[index + 1] : Data.Last().Key;
+                if (de.Key == nextDate)
+                    break;
+                DateTime d1 = de.Key.AddMinutes(0);
+                DateTime d2 = nextDate.AddMinutes(0);
+                TimeSpan ts = d2 - d1;
+                int mins = (int)ts.TotalMinutes;
+                double v2 = Data[d2];
+                double v1 = Data[d1];
+                for (int i = 0; i < mins; i++)
+                {
+                    DateTime d = d1.AddMinutes(i);
+                    double val = v1+ (v2 - v1) / mins * i;
+                    if (!hh.ContainsKey(d))
+                    {
+                        hh.Add(d, val);
+                    }
+                }
+                index++;
+            }
+            return hh;
+        }
+
+        protected SortedList<DateTime, double> createHH15Data() {
 			SortedList<DateTime, double> hh = new SortedList<DateTime, double>();
 			int index = 0;
 			foreach (KeyValuePair<DateTime, double> de in Data) {
@@ -109,7 +143,7 @@ namespace EDSProj.ModesCentre
 			return hh;
 		}
 
-		public bool writeToEDS(string pointName, SortedList<DateTime, double> data, bool data15) {
+		public bool writeToEDS(string pointName, SortedList<DateTime, double> data, bool data15,bool datamin) {
 			bool ok = false;
 			try {
 				//SortedList<DateTime, double> data15 = createHH15Data();
@@ -152,7 +186,22 @@ namespace EDSProj.ModesCentre
 								d = d.AddMinutes(1);
 							}
 						};
-					} else {
+					}else if (datamin)
+                    {
+                        foreach (KeyValuePair<DateTime, double> de in data)
+                        {
+                            vals.Add(new ShadeValue()
+                            {
+                                period = new TimePeriod()
+                                {
+                                    from = new Timestamp() { second = EDSClass.toTS(de.Key.AddHours(2)) },
+                                    till = new Timestamp() { second = EDSClass.toTS(de.Key.AddHours(2).AddMinutes(1)) }
+                                },
+                                quality = Quality.QUALITYGOOD,
+                                value = new PointValue() { av = (float)de.Value, avSpecified = true }
+                            });
+                        };
+                    } else {
 						double sum = 0;
 						foreach (KeyValuePair<DateTime, double> de in data) {
 							DateTime d = de.Key.AddMinutes(0);
@@ -204,14 +253,20 @@ namespace EDSProj.ModesCentre
 			try {
 				bool ok = true;
 				SortedList<DateTime, double> data15 = createHH15Data();
+                SortedList<DateTime, double> smooth = createSmoothData();
 				if (!String.IsNullOrEmpty(this.PointName) && DataSettings.WriteToEDS) {
 					Logger.Info("Запись в ЕДС данных ПБР");
-					ok= ok && this.writeToEDS(this.PointName, createHH15Data(), true);
+					ok= ok && this.writeToEDS(this.PointName, data15, true,false);
 				}
-				if (DataSettings.WriteIntegratedData && !String.IsNullOrEmpty(DataSettings.IntegratedEDSPoint)) {
+                if (!String.IsNullOrEmpty(this.SmoothPointName) && DataSettings.WriteToEDS)
+                {
+                    Logger.Info("Запись в ЕДС данных ПБР (сглаж)");
+                    ok = ok && this.writeToEDS(this.SmoothPointName, smooth, false, true);
+                }
+                if (DataSettings.WriteIntegratedData && !String.IsNullOrEmpty(DataSettings.IntegratedEDSPoint)) {
 					SortedList<DateTime, double> integr = createInegratedData();
 					Logger.Info("Запись в ЕДС интегрированных данных");
-					ok= ok && this.writeToEDS(DataSettings.IntegratedEDSPoint, integr, false);
+					ok= ok && this.writeToEDS(DataSettings.IntegratedEDSPoint, integr, false,false);
 				}
 				return ok;
 			} catch (Exception e) {

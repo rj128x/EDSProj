@@ -15,6 +15,7 @@
       <MCName>338730</MCName>
       <PiramidaCode>1</PiramidaCode>
       <EDSPoint>PBR_GES.EDS@CALC</EDSPoint>
+      <EDSPointSmooth>PBR_GES_SMOOTH.EDS@CALC</EDSPointSmooth>
       <WriteIntegratedData>1</WriteIntegratedData>
       <WriteToEDS>1</WriteToEDS>
       <IntegratedEDSPoint>PBR_GES_VYR_PLAN.EDS@CALC</IntegratedEDSPoint>
@@ -27,6 +28,7 @@
       <PiramidaCode>2</PiramidaCode>
       <WriteToEDS>1</WriteToEDS>
       <EDSPoint>PBR_GTP1.EDS@CALC</EDSPoint>
+      <EDSPointSmooth>PBR_GTP1_SMOOTH.EDS@CALC</EDSPointSmooth>
       <WriteIntegratedData>0</WriteIntegratedData>
       <Autooper>0</Autooper>
     </MCSettingsRecord>
@@ -37,6 +39,7 @@
       <PiramidaCode>3</PiramidaCode>
       <WriteToEDS>1</WriteToEDS>
       <EDSPoint>PBR_GTP2.EDS@CALC</EDSPoint>
+      <EDSPointSmooth>PBR_GTP2_SMOOTH.EDS@CALC</EDSPointSmooth>
       <WriteIntegratedData>0</WriteIntegratedData>
       <Autooper>0</Autooper>
     </MCSettingsRecord>

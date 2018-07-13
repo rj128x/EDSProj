@@ -15,7 +15,8 @@ namespace EDSProj.ModesCentre
 		public bool Autooper { get; set; }
 		public string MCName { get; set; }
 		public string EDSPoint { get; set; }
-		public string IntegratedEDSPoint { get; set; }
+        public string EDSPointSmooth { get; set; }
+        public string IntegratedEDSPoint { get; set; }
         
     }
 
